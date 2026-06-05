@@ -40,14 +40,14 @@ console.log(`[dotenv] Gmail credentials ${_gmailConfigured ? 'DETECTED ✓' : 'N
 import cors from 'cors';
 import morgan from 'morgan';
 import mongoose from 'mongoose';
-import authRoutes from './routes/auth.js';
-import roomRoutes from './routes/rooms.js';
-import bookingRoutes from './routes/bookings.js';
-import reviewRoutes from './routes/reviews.js';
-import offerRoutes from './routes/offers.js';
-import adminRoutes from './routes/admin.js';
-import notificationRoutes from './routes/notifications.js';
-import paymentRoutes from './routes/payments.js';
+import authRoutes from '../routes/auth.js';
+import roomRoutes from '../routes/rooms.js';
+import bookingRoutes from '../routes/bookings.js';
+import reviewRoutes from '../routes/reviews.js';
+import offerRoutes from '../routes/offers.js';
+import adminRoutes from '../routes/admin.js';
+import notificationRoutes from '../routes/notifications.js';
+import paymentRoutes from '../routes/payments.js';
 
 const app = express();
 const port = process.env.PORT || 5000;
