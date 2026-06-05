@@ -9,7 +9,7 @@
     "server": "nodemon server/index.js",
     "build": "vite build --configLoader runner",
     "preview": "vite preview --host 127.0.0.1 --configLoader runner",
-    "start": "node server/index.js",
+    "start": "node server/utils/index.js",
     "seed": "node server/seed.js"
   },
   "dependencies": {
