@@ -3,15 +3,17 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
+
   "scripts": {
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     "client": "vite --host 127.0.0.1 --configLoader runner",
-    "server": "nodemon server/index.js",
+    "server": "nodemon server/utils/index.js",
     "build": "vite build --configLoader runner",
     "preview": "vite preview --host 127.0.0.1 --configLoader runner",
     "start": "node server/utils/index.js",
     "seed": "node server/seed.js"
   },
+
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "concurrently": "^9.1.2",
@@ -32,6 +34,7 @@
     "recharts": "^2.15.1",
     "vite": "^6.1.0"
   },
+
   "devDependencies": {
     "@vitejs/plugin-react": "^4.3.4",
     "autoprefixer": "^10.4.20",
