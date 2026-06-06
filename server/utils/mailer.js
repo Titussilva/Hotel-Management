@@ -10,12 +10,14 @@ function getTransporter() {
   }
 
   return nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 465,
-    secure: true,
-    auth: { user, pass },
-    authMethod: 'LOGIN',
-  });
+  host: 'smtp.gmail.com',
+  port: 587,
+  secure: false,
+  auth: { user, pass },
+  tls: {
+    rejectUnauthorized: false
+  }
+});
 }
 
 export async function sendBookingEmail({ booking, room, user, recipient }) {
