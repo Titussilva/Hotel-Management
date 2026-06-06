@@ -8,8 +8,7 @@ const router = express.Router();
 
 router.get('/', async (req, res) => {
   const { type, minPrice, maxPrice, amenities, checkIn, checkOut, guests } = req.query;
-  const query = { isActive: true };
-
+const query = { isActive: { $ne: false } };
   if (type) query.type = type;
   if (guests) query.maxGuests = { $gte: Number(guests) };
   if (minPrice || maxPrice) {
