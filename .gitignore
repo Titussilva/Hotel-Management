@@ -59,3 +59,10 @@ temp/
 .env.backup
 .env.*
 !.env.example
+Hotel-Management/
+
+node_modules/
+
+.npm-cache/
+
+.env
