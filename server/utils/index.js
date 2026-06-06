@@ -55,7 +55,7 @@ const port = process.env.PORT || 5000;
 app.use(cors({
   origin: [
     'http://localhost:5173',
-    process.env.FRONTEND_URL || 'https://your-netlify-app.netlify.app'
+    process.env.FRONTEND_URL || 'https://mern-hotel-mangement.netlify.app/'
   ],
   credentials: true
 }));
