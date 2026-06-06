@@ -52,7 +52,13 @@ import paymentRoutes from '../routes/payments.js';
 const app = express();
 const port = process.env.PORT || 5000;
 
-app.use(cors({ origin: true, credentials: true }));
+app.use(cors({
+  origin: [
+    'http://localhost:5173',
+    process.env.FRONTEND_URL || 'https://your-netlify-app.netlify.app'
+  ],
+  credentials: true
+}));
 app.use(express.json());
 app.use(morgan('dev'));
 
