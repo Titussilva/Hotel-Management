@@ -3,40 +3,6 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import express from 'express';
-
-
-// Ensure .env is loaded even if the process cwd differs.
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-function loadEnvIfNeeded() {
-  // Do NOT short-circuit: always attempt to load .env so all variables
-  // (not just the two Gmail ones) are merged in from the file.
-  const candidates = [
-    path.resolve(__dirname, '.env'),
-    path.resolve(__dirname, '..', '.env'),
-    path.resolve(__dirname, '..', '..', '.env'),
-  ];
-
-  for (const candidate of candidates) {
-    if (fs.existsSync(candidate)) {
-      dotenv.config({ path: candidate });
-      return { loaded: true, source: candidate };
-    }
-  }
-
-  const res = dotenv.config();
-  return { loaded: !!res.parsed, source: res.error ? 'default' : 'env' };
-}
-
-const envLoadResult = loadEnvIfNeeded();
-console.log('[dotenv] load result:', envLoadResult);
-
-// Log Gmail credential presence immediately after .env is loaded.
-const _gmailConfigured =
-  !!(process.env.GMAIL_USER || '').trim() &&
-  !!(process.env.GMAIL_APP_PASSWORD || '').trim() &&
-  !(process.env.GMAIL_APP_PASSWORD || '').includes('replace_me');
-console.log(`[dotenv] Gmail credentials ${_gmailConfigured ? 'DETECTED ✓' : 'NOT FOUND ✗'} (GMAIL_USER=${(process.env.GMAIL_USER || '(empty)').trim()})`);
 import cors from 'cors';
 import morgan from 'morgan';
 import mongoose from 'mongoose';
@@ -49,18 +15,49 @@ import adminRoutes from '../routes/admin.js';
 import notificationRoutes from '../routes/notifications.js';
 import paymentRoutes from '../routes/payments.js';
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+function loadEnvIfNeeded() {
+  const candidates = [
+    path.resolve(__dirname, '.env'),
+    path.resolve(__dirname, '..', '.env'),
+    path.resolve(__dirname, '..', '..', '.env'),
+  ];
+  for (const candidate of candidates) {
+    if (fs.existsSync(candidate)) {
+      dotenv.config({ path: candidate });
+      return { loaded: true, source: candidate };
+    }
+  }
+  const res = dotenv.config();
+  return { loaded: !!res.parsed, source: res.error ? 'default' : 'env' };
+}
+
+const envLoadResult = loadEnvIfNeeded();
+console.log('[dotenv] load result:', envLoadResult);
+
+const _gmailConfigured =
+  !!(process.env.GMAIL_USER || '').trim() &&
+  !!(process.env.GMAIL_APP_PASSWORD || '').trim() &&
+  !(process.env.GMAIL_APP_PASSWORD || '').includes('replace_me');
+console.log(`[dotenv] Gmail credentials ${_gmailConfigured ? 'DETECTED ✓' : 'NOT FOUND ✗'} (GMAIL_USER=${(process.env.GMAIL_USER || '(empty)').trim()})`);
+
 const app = express();
 const port = process.env.PORT || 5000;
 
 app.use(cors({
-  origin: [
-    'http://localhost:5173',
-    process.env.FRONTEND_URL || 'https://mern-hotel-mangement.netlify.app'
-  ],
+  origin: function(origin, callback) {
+    callback(null, true);
+  },
   credentials: true
 }));
 app.use(express.json());
 app.use(morgan('dev'));
+
+app.get('/api/health', (_req, res) => {
+  res.json({ ok: true, service: 'hotel-booking-system' });
+});
 
 app.get('/api/seed', async (_req, res) => {
   try {
