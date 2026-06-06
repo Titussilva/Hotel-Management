@@ -374,7 +374,7 @@ function App() {
   const query = new URLSearchParams(queryObj).toString();
   const { data: rooms, loading } = useApi(`/rooms?${query}`, fallbackRooms, session?.token);
   const { data: offers } = useApi('/offers', fallbackOffers, session?.token);
-  const activeRoom = selectedRoom || (rooms[0] && !String(rooms[0]._id).startsWith('demo-') ? rooms[0] : null) || null;
+  const activeRoom = selectedRoom || rooms[0] || fallbackRooms[0];
   const nights = nightsBetween(filters.checkIn, filters.checkOut);
   const discount = offerCode.toUpperCase().includes('20') ? activeRoom.price * nights * 0.2 : offerCode ? 2500 : 0;
   const total = Math.max(0, activeRoom.price * nights - discount);
