@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-
   "scripts": {
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     "client": "vite --host 127.0.0.1 --configLoader runner",
@@ -13,7 +12,6 @@
     "start": "node server/utils/index.js",
     "seed": "node server/seed.js"
   },
-
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "concurrently": "^9.1.2",
@@ -23,6 +21,7 @@
     "framer-motion": "^12.4.7",
     "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.475.0",
+    "mongodb": "^7.2.0",
     "mongoose": "^8.10.0",
     "morgan": "^1.10.0",
     "nodemailer": "^8.0.10",
@@ -34,7 +33,6 @@
     "recharts": "^2.15.1",
     "vite": "^6.1.0"
   },
-
   "devDependencies": {
     "@vitejs/plugin-react": "^4.3.4",
     "autoprefixer": "^10.4.20",
