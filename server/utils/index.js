@@ -53,9 +53,10 @@ const app = express();
 const port = process.env.PORT || 5000;
 
 app.use(cors({
-  origin: function(origin, callback) {
-    callback(null, true);
-  },
+  origin: [
+    'http://localhost:5173',
+    process.env.FRONTEND_URL || 'https://mern-hotel-mangement.netlify.app'
+  ],
   credentials: true
 }));
 app.use(express.json());
