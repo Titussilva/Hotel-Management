@@ -1,156 +1,50 @@
-import nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 
-function getTransporter() {
-  const user = process.env.GMAIL_USER;
-  const pass = process.env.GMAIL_APP_PASSWORD;
-
-  if (!user || !pass || pass.includes('replace_me')) {
-    console.warn('Gmail SMTP not configured. Set GMAIL_USER and GMAIL_APP_PASSWORD in .env.');
-    return null;
-  }
-
-  return nodemailer.createTransport({
-  host: 'smtp.gmail.com',
-  port: 587,
-  secure: false,
-  auth: { user, pass },
-  tls: {
-    rejectUnauthorized: false
-  },
-  connectionTimeout: 10000,
-  greetingTimeout: 10000,
-  socketTimeout: 10000,
-});
-}
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function sendBookingEmail({ booking, room, user, recipient }) {
-  const transporter = getTransporter();
   const to = recipient || booking.guestDetails?.email || user.email;
-  const cc = process.env.BOOKING_EMAIL_TO && process.env.BOOKING_EMAIL_TO !== to ? process.env.BOOKING_EMAIL_TO : undefined;
 
-  const formatDate = (value) => new Date(value).toLocaleDateString('en-IN', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-  });
-  const money = (value) => new Intl.NumberFormat('en-IN', {
-    style: 'currency',
-    currency: 'INR',
-    maximumFractionDigits: 0,
-  }).format(value || 0);
-  const paymentLabels = {
-    card: 'Credit/debit card',
-    digital_wallet: 'Digital wallet',
-    upi: 'UPI',
-    netbanking: 'Net banking',
-    pay_at_hotel: 'Pay at hotel',
-    pay_by_email: 'Pay after email confirmation',
-  };
-  const paymentMethod = paymentLabels[booking.paymentMethod] || booking.paymentMethod || 'Not selected';
-
-  const receiptSections = [
-    {
-      title: 'Booking Details',
-      rows: [
-        ['Booking ID', booking._id],
-        ['Status', 'Booked successfully'],
-        ['Check-in', formatDate(booking.checkIn)],
-        ['Check-out', formatDate(booking.checkOut)],
-        ['Guests', booking.guests],
-        ['Special requests', booking.specialRequests || 'None'],
-      ],
-    },
-    {
-      title: 'Room Details',
-      rows: [
-        ['Room', room.name],
-        ['Room type', room.type],
-        ['Room size', room.size || 'Not specified'],
-        ['Bed type', room.bedType || 'Not specified'],
-        ['View', room.view || 'Not specified'],
-        ['Amenities', room.amenities?.join(', ') || 'Not specified'],
-      ],
-    },
-    {
-      title: 'Guest and Payment',
-      rows: [
-        ['Guest', booking.guestDetails?.name || user.name],
-        ['Email', booking.guestDetails?.email || user.email],
-        ['Phone', booking.guestDetails?.phone || 'Not provided'],
-        ['Payment method', paymentMethod],
-        ['Payment status', booking.paymentStatus],
-      ],
-    },
-    {
-      title: 'Price Summary',
-      rows: [
-        ['Subtotal', money(booking.subtotal)],
-        ['Discount', money(booking.discount)],
-        ['Total', money(booking.total)],
-      ],
-    },
-  ];
-
-  const lines = [
-    'Booked successfully',
-    '',
-    ...receiptSections.flatMap((section) => [
-      section.title,
-      ...section.rows.map(([label, value]) => `${label}: ${value}`),
-      '',
-    ]),
-  ];
-
-  const renderRows = (rows) => rows
-    .map(([label, value]) => `<tr><td style="font-weight:700;border:1px solid #ddd;padding:8px;background:#f8faf8">${label}</td><td style="border:1px solid #ddd;padding:8px">${value}</td></tr>`)
-    .join('');
-
-  if (!transporter) {
-    console.log('Gmail not configured. Booking email content:');
-    console.log(lines.join('\n'));
-    return { sent: false, reason: 'Gmail is not configured', to, cc };
+  if (!process.env.RESEND_API_KEY) {
+    console.warn('Resend API key not configured.');
+    return { sent: false, reason: 'Resend not configured', to };
   }
 
+  const formatDate = (value) => new Date(value).toLocaleDateString('en-IN', {
+    day: '2-digit', month: 'short', year: 'numeric',
+  });
+
+  const money = (value) => new Intl.NumberFormat('en-IN', {
+    style: 'currency', currency: 'INR', maximumFractionDigits: 0,
+  }).format(value || 0);
+
   try {
-    await transporter.sendMail({
-      from: `"${process.env.BOOKING_EMAIL_FROM_NAME || 'StayEase Hotel Booking'}" <${process.env.GMAIL_USER}>`,
+    await resend.emails.send({
+      from: 'StayEase <onboarding@resend.dev>',
       to,
-      cc,
       subject: `Booking receipt - ${room.name}`,
-      text: lines.join('\n'),
       html: `
         <div style="font-family:Arial,sans-serif;line-height:1.6;color:#17211f;max-width:720px;margin:0 auto">
           <div style="background:#17211f;color:#fff;padding:24px;border-radius:10px 10px 0 0">
             <h1 style="margin:0;font-size:26px">Booked successfully</h1>
-            <p style="margin:8px 0 0;color:#dfe9e4">Thank you for booking with StayEase. Your booking receipt is below.</p>
+            <p style="margin:8px 0 0;color:#dfe9e4">Thank you for booking with StayEase.</p>
           </div>
           <div style="border:1px solid #ddd;border-top:0;padding:20px;border-radius:0 0 10px 10px">
-            ${receiptSections.map((section) => `
-              <h2 style="font-size:18px;margin:18px 0 8px">${section.title}</h2>
-              <table cellpadding="0" cellspacing="0" style="border-collapse:collapse;width:100%;margin-bottom:12px">
-                ${renderRows(section.rows)}
-              </table>
-            `).join('')}
-            <p style="margin-top:18px;color:#4b5563">Please keep this receipt for your records.</p>
+            <h2>Booking Details</h2>
+            <p><strong>Booking ID:</strong> ${booking._id}</p>
+            <p><strong>Room:</strong> ${room.name}</p>
+            <p><strong>Check-in:</strong> ${formatDate(booking.checkIn)}</p>
+            <p><strong>Check-out:</strong> ${formatDate(booking.checkOut)}</p>
+            <p><strong>Guests:</strong> ${booking.guests}</p>
+            <p><strong>Total:</strong> ${money(booking.total)}</p>
+            <p><strong>Payment Status:</strong> ${booking.paymentStatus}</p>
           </div>
         </div>
       `,
     });
+    return { sent: true, to };
   } catch (error) {
-    console.error('Gmail send failed:', {
-      message: error.message,
-      code: error.code,
-      response: error.response,
-    });
-    return {
-      sent: false,
-      to,
-      cc,
-      reason: error.message || 'Unknown email error',
-      errorCode: error.code,
-      errorResponse: error.response,
-    };
+    console.error('Resend email failed:', error.message);
+    return { sent: false, reason: error.message, to };
   }
-
-  return { sent: true, to, cc };
 }
