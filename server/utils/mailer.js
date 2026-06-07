@@ -1,13 +1,20 @@
-import { Resend } from 'resend';
+// utils/sendEmail.js
+import nodemailer from 'nodemailer';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.GMAIL_USER,
+    pass: process.env.GMAIL_APP_PASSWORD,
+  },
+});
 
 export async function sendBookingEmail({ booking, room, user, recipient }) {
   const to = recipient || booking.guestDetails?.email || user.email;
 
-  if (!process.env.RESEND_API_KEY) {
-    console.warn('Resend API key not configured.');
-    return { sent: false, reason: 'Resend not configured', to };
+  if (!process.env.GMAIL_USER || !process.env.GMAIL_APP_PASSWORD) {
+    console.warn('Gmail credentials not configured.');
+    return { sent: false, reason: 'Gmail not configured', to };
   }
 
   const formatDate = (value) => new Date(value).toLocaleDateString('en-IN', {
@@ -19,14 +26,14 @@ export async function sendBookingEmail({ booking, room, user, recipient }) {
   }).format(value || 0);
 
   try {
-    await resend.emails.send({
-      from: 'StayEase <onboarding@resend.dev>',
+    await transporter.sendMail({
+      from: `"StayEase" <${process.env.GMAIL_USER}>`,
       to,
-      subject: `Booking receipt - ${room.name}`,
+      subject: `Booking Confirmed – ${room.name}`,
       html: `
         <div style="font-family:Arial,sans-serif;line-height:1.6;color:#17211f;max-width:720px;margin:0 auto">
           <div style="background:#17211f;color:#fff;padding:24px;border-radius:10px 10px 0 0">
-            <h1 style="margin:0;font-size:26px">Booked successfully</h1>
+            <h1 style="margin:0;font-size:26px">Booked Successfully ✅</h1>
             <p style="margin:8px 0 0;color:#dfe9e4">Thank you for booking with StayEase.</p>
           </div>
           <div style="border:1px solid #ddd;border-top:0;padding:20px;border-radius:0 0 10px 10px">
@@ -44,7 +51,7 @@ export async function sendBookingEmail({ booking, room, user, recipient }) {
     });
     return { sent: true, to };
   } catch (error) {
-    console.error('Resend email failed:', error.message);
+    console.error('Gmail send failed:', error.message);
     return { sent: false, reason: error.message, to };
   }
 }
