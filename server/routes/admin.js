@@ -89,6 +89,9 @@ router.post('/offers', async (req, res) => {
   try {
     console.debug('[admin] POST /offers', { body: req.body, user: req.user?._id });
     const offerData = { ...req.body };
+    // Ensure required date fields have defaults
+    if (!offerData.validFrom) offerData.validFrom = new Date();
+    if (!offerData.validTo) offerData.validTo = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
     if (offerData.code) offerData.code = String(offerData.code).toUpperCase();
     const offer = await Offer.create(offerData);
     console.debug('[admin] offer created', { id: offer._id });
@@ -102,6 +105,9 @@ router.put('/offers/:id', async (req, res) => {
   try {
     console.debug('[admin] PUT /offers/:id', { id: req.params.id, body: req.body, user: req.user?._id });
     const update = { ...req.body };
+    // Ensure required date fields have defaults
+    if (!update.validFrom) update.validFrom = new Date();
+    if (!update.validTo) update.validTo = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
     if (update.code) update.code = String(update.code).toUpperCase();
     const offer = await Offer.findByIdAndUpdate(req.params.id, update, { new: true, runValidators: true });
     if (!offer) return res.status(404).json({ message: 'Offer not found' });
@@ -111,6 +117,7 @@ router.put('/offers/:id', async (req, res) => {
     handleAdminError(res, error);
   }
 });
+
 
 router.delete('/offers/:id', async (req, res) => {
   try {
