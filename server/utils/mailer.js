@@ -2,18 +2,25 @@ import nodemailer from 'nodemailer';
 
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
-  port: Number(process.env.SMTP_PORT || 587),
+  port: 587,
+
   secure: false,
+
+  requireTLS: true,
+
   auth: {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS,
   },
+
+  connectionTimeout: 15000,
+  greetingTimeout: 15000,
+  socketTimeout: 15000,
 });
 
-// Check SMTP during startup
-transporter.verify((error) => {
-  if (error) {
-    console.error('[SMTP ERROR]', error.message);
+transporter.verify((err) => {
+  if (err) {
+    console.error('[SMTP ERROR]', err);
   } else {
     console.log('[SMTP READY]');
   }
