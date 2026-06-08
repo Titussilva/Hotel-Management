@@ -2,12 +2,21 @@ import nodemailer from 'nodemailer';
 
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
-  port: Number(process.env.SMTP_PORT),
+  port: Number(process.env.SMTP_PORT || 587),
   secure: false,
   auth: {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS,
   },
+});
+
+// Check SMTP during startup
+transporter.verify((error) => {
+  if (error) {
+    console.error('[SMTP ERROR]', error.message);
+  } else {
+    console.log('[SMTP READY]');
+  }
 });
 
 export async function sendBookingEmail({
@@ -22,6 +31,8 @@ export async function sendBookingEmail({
       booking?.guestDetails?.email ||
       user?.email;
 
+    console.log('[MAIL] recipient:', to);
+
     if (!to) {
       return {
         sent: false,
@@ -30,24 +41,39 @@ export async function sendBookingEmail({
     }
 
     const html = `
-      <h2>Booking Confirmed ✅</h2>
+      <div style="font-family:Arial;padding:20px">
+        <h2>Booking Confirmed ✅</h2>
 
-      <p>Hello ${user?.name || 'Guest'},</p>
+        <p>Hello ${user?.name || 'Guest'},</p>
 
-      <p>Your booking is confirmed.</p>
+        <p>Your booking has been confirmed.</p>
 
-      <p><b>Room:</b> ${room.name}</p>
-      <p><b>Check In:</b> ${booking.checkIn}</p>
-      <p><b>Check Out:</b> ${booking.checkOut}</p>
-      <p><b>Total:</b> ₹${booking.total}</p>
+        <hr>
 
-      <br/>
+        <p><strong>Room:</strong> ${room?.name}</p>
 
-      <p>Thank you for choosing StayEase.</p>
+        <p><strong>Check In:</strong>
+        ${new Date(booking.checkIn).toLocaleDateString()}</p>
+
+        <p><strong>Check Out:</strong>
+        ${new Date(booking.checkOut).toLocaleDateString()}</p>
+
+        <p><strong>Total:</strong>
+        ₹${booking.total}</p>
+
+        <p><strong>Payment Status:</strong>
+        ${booking.paymentStatus}</p>
+
+        <br>
+
+        <p>Thank you for choosing StayEase.</p>
+      </div>
     `;
 
     const info = await transporter.sendMail({
-      from: process.env.EMAIL_FROM,
+      from:
+        process.env.EMAIL_FROM ||
+        process.env.SMTP_USER,
       to,
       subject: `Booking Confirmed – ${room.name}`,
       html,
@@ -69,10 +95,3 @@ export async function sendBookingEmail({
     };
   }
 }
-transporter.verify((error, success) => {
-  if (error) {
-    console.log('[SMTP ERROR]', error);
-  } else {
-    console.log('[SMTP READY]');
-  }
-});
