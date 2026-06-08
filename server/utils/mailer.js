@@ -53,28 +53,49 @@ export async function sendBookingEmail({ booking, room, user, recipient }) {
   `;
 
   try {
+    const fromAddress = 'StayEase <onboarding@resend.dev>';
+    const requestBody = {
+      from: fromAddress,
+      to,
+      subject: `Booking Confirmed – ${room.name}`,
+      html,
+    };
+
+    console.log(`[mailer] Sending email via Resend...`);
+    console.log(`[mailer] Sender: ${fromAddress}`);
+    console.log(`[mailer] Recipient: ${to}`);
+    console.log(`[mailer] Auth Header starts with: Bearer ${process.env.RESEND_API_KEY.substring(0, 8)}...`);
+
     const response = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        from: 'StayEase <onboarding@resend.dev>',
-        to,
-        subject: `Booking Confirmed – ${room.name}`,
-        html,
-      }),
+      body: JSON.stringify(requestBody),
     });
 
     const result = await response.json();
+    
+    console.log(`[mailer] Resend HTTP Status: ${response.status} ${response.statusText}`);
+    console.log(`[mailer] Full Resend response:`, JSON.stringify(result, null, 2));
+
     if (!response.ok) {
-      console.error('Resend email failed:', result);
-      return { sent: false, reason: result.error?.message || 'Resend error', to };
+      console.error('[mailer] Resend email failed:', result);
+      
+      // Check if Resend rejected the onboarding sender
+      let reason = result.error?.message || 'Resend error';
+      if (response.status === 403 && reason.toLowerCase().includes('can only send testing emails to its own email address')) {
+         reason = `Resend rejection: The onboarding sender (onboarding@resend.dev) is active on the free tier, which restricts sending emails strictly to the exact verified email address registered with your Resend account. To send emails to arbitrary guests, you must verify your own custom domain in the Resend dashboard.`;
+      }
+      
+      return { sent: false, reason, to };
     }
+    
+    console.log(`[mailer] Email sent successfully to ${to}. ID: ${result.id}`);
     return { sent: true, to };
   } catch (error) {
-    console.error('Resend send failed:', error.message);
+    console.error('[mailer] Resend send exception:', error.message);
     return { sent: false, reason: error.message, to };
   }
 }
