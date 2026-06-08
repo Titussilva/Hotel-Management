@@ -1,5 +1,5 @@
 // utils/sendEmail.js
-import fetch from 'node-fetch';
+
 
 /**
  * Sends a booking confirmation email using Resend's email API.
