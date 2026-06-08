@@ -144,10 +144,63 @@ router.post('/verify', requireAuth, async (req, res) => {
       razorpayPaymentId: razorpay_payment_id,
     });
 
-    console.log('[payments] booking saved:', booking._id, '– paymentStatus: paid');
+    console.log('[payments] bookinconst recipient = emailTo || guestDetails?.email || req.user.email;
 
-    const recipient  = emailTo || guestDetails?.email || req.user.email;
-    const emailResult = await sendBookingEmail({ booking, room, user: req.user, recipient });
+console.log('[payments] EMAIL START');
+console.log('[payments] recipient:', recipient);
+
+let emailResult = {
+  sent: false,
+  reason: 'Email function not executed',
+};
+
+try {
+  emailResult = await sendBookingEmail({
+    booking,
+    room,
+    user: req.user,
+    recipient,
+  });
+
+  console.log('[payments] EMAIL RESULT:', emailResult);
+} catch (emailError) {
+  console.error('[payments] EMAIL ERROR:', emailError);
+  emailResult = {
+    sent: false,
+    reason: emailError.message,
+  };
+}
+
+await Notification.insertMany([
+  {
+    user: req.user._id,
+    type: 'booking',
+    channel: 'in_app',
+    title: 'Booking confirmed',
+    message: `${room.name} confirmed from ${new Date(checkIn).toLocaleDateString()} to ${new Date(checkOut).toLocaleDateString()}.`,
+  },
+  {
+    user: req.user._id,
+    type: 'payment',
+    channel: 'email',
+    title: 'Payment successful',
+    message: `₹${total.toLocaleString('en-IN')} paid via Razorpay. ID: ${razorpay_payment_id}`,
+  },
+]);
+
+const populated = await booking.populate('room');
+
+return res.status(201).json({
+  ...populated.toObject(),
+  emailResult,
+});g saved:', booking._id, '– paymentStatus: paid');
+
+    const recipient = emailTo || guestDetails?.email || req.user.email;
+
+console.log('[payments] EMAIL START');
+
+const emailResult = await sendBookingEmail({
+ 
 
     await Notification.insertMany([
       {
