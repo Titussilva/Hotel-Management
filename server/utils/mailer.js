@@ -76,6 +76,8 @@ export async function sendBookingEmail({ booking, room, user, recipient }) {
     });
 
     const result = await response.json();
+    console.log('[mailer] status:', response.status);
+console.log('[mailer] result:', result);
     
     console.log(`[mailer] Resend HTTP Status: ${response.status} ${response.statusText}`);
     console.log(`[mailer] Full Resend response:`, JSON.stringify(result, null, 2));
@@ -88,7 +90,7 @@ export async function sendBookingEmail({ booking, room, user, recipient }) {
       if (response.status === 403 && reason.toLowerCase().includes('can only send testing emails to its own email address')) {
          reason = `Resend rejection: The onboarding sender (onboarding@resend.dev) is active on the free tier, which restricts sending emails strictly to the exact verified email address registered with your Resend account. To send emails to arbitrary guests, you must verify your own custom domain in the Resend dashboard.`;
       }
-      
+      console.log('[mailer] FAILED');
       return { sent: false, reason, to };
     }
     
