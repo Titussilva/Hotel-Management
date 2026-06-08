@@ -69,3 +69,10 @@ export async function sendBookingEmail({
     };
   }
 }
+transporter.verify((error, success) => {
+  if (error) {
+    console.log('[SMTP ERROR]', error);
+  } else {
+    console.log('[SMTP READY]');
+  }
+});
