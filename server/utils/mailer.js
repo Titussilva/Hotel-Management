@@ -1,30 +1,4 @@
-import nodemailer from 'nodemailer';
-
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: 587,
-
-  secure: false,
-
-  requireTLS: true,
-
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
-  },
-
-  connectionTimeout: 15000,
-  greetingTimeout: 15000,
-  socketTimeout: 15000,
-});
-
-transporter.verify((err) => {
-  if (err) {
-    console.error('[SMTP ERROR]', err);
-  } else {
-    console.log('[SMTP READY]');
-  }
-});
+import axios from 'axios';
 
 export async function sendBookingEmail({
   booking,
@@ -38,8 +12,6 @@ export async function sendBookingEmail({
       booking?.guestDetails?.email ||
       user?.email;
 
-    console.log('[MAIL] recipient:', to);
-
     if (!to) {
       return {
         sent: false,
@@ -48,57 +20,65 @@ export async function sendBookingEmail({
     }
 
     const html = `
-      <div style="font-family:Arial;padding:20px">
-        <h2>Booking Confirmed ✅</h2>
+      <h2>Booking Confirmed ✅</h2>
 
-        <p>Hello ${user?.name || 'Guest'},</p>
+      <p>Hello ${user?.name || 'Guest'},</p>
 
-        <p>Your booking has been confirmed.</p>
+      <p>Your booking is confirmed.</p>
 
-        <hr>
+      <p><b>Room:</b> ${room.name}</p>
+      <p><b>Check In:</b> ${booking.checkIn}</p>
+      <p><b>Check Out:</b> ${booking.checkOut}</p>
+      <p><b>Total:</b> ₹${booking.total}</p>
 
-        <p><strong>Room:</strong> ${room?.name}</p>
+      <br/>
 
-        <p><strong>Check In:</strong>
-        ${new Date(booking.checkIn).toLocaleDateString()}</p>
-
-        <p><strong>Check Out:</strong>
-        ${new Date(booking.checkOut).toLocaleDateString()}</p>
-
-        <p><strong>Total:</strong>
-        ₹${booking.total}</p>
-
-        <p><strong>Payment Status:</strong>
-        ${booking.paymentStatus}</p>
-
-        <br>
-
-        <p>Thank you for choosing StayEase.</p>
-      </div>
+      <p>Thank you for choosing StayEase.</p>
     `;
 
-    const info = await transporter.sendMail({
-      from:
-        process.env.EMAIL_FROM ||
-        process.env.SMTP_USER,
-      to,
-      subject: `Booking Confirmed – ${room.name}`,
-      html,
-    });
+    const response = await axios.post(
+      'https://api.brevo.com/v3/smtp/email',
+      {
+        sender: {
+          name: 'StayEase',
+          email: process.env.EMAIL_FROM,
+        },
 
-    console.log('[MAIL SUCCESS]', info.messageId);
+        to: [
+          {
+            email: to,
+          },
+        ],
+
+        subject: `Booking Confirmed – ${room.name}`,
+
+        htmlContent: html,
+      },
+      {
+        headers: {
+          'api-key': process.env.BREVO_API_KEY,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+
+    console.log('[MAIL SUCCESS]', response.data);
 
     return {
       sent: true,
-      messageId: info.messageId,
     };
 
   } catch (err) {
-    console.error('[MAIL ERROR]', err);
+    console.error(
+      '[MAIL ERROR]',
+      err.response?.data || err.message
+    );
 
     return {
       sent: false,
-      reason: err.message,
+      reason:
+        err.response?.data?.message ||
+        err.message,
     };
   }
 }
