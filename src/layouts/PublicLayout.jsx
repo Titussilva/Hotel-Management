@@ -100,7 +100,7 @@ export function PublicLayout() {
                   <Link to={isAdmin ? "/admin" : "/dashboard"} className="btn-primary text-center" onClick={() => setMenuOpen(false)}>
                     {isAdmin ? 'Admin Dashboard' : 'Dashboard'}
                   </Link>
-                  <button onClick={() => { logout(); setMenuOpen(false); window.location.href = '/'; }} className="btn-secondary text-center">
+                  <button onClick={() => { logout(); setMenuOpen(false); navigate('/'); }} className="btn-secondary text-center">
                     Log out
                   </button>
                 </>
