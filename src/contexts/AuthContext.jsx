@@ -12,8 +12,31 @@ export function AuthProvider({ children }) {
       return null;
     }
   });
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
+  useEffect(() => {
+    const initAuth = async () => {
+      const saved = localStorage.getItem('stayease-session');
+      if (!saved) {
+        setLoading(false);
+        return;
+      }
+      try {
+        const { token } = JSON.parse(saved);
+        if (token && token !== 'demo-token' && token !== 'demo-admin-token') {
+          const user = await authAPI.me();
+          setSession({ token, user });
+        }
+      } catch (err) {
+        console.error('Session restore failed:', err);
+        localStorage.removeItem('stayease-session');
+        setSession(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+    initAuth();
+  }, []);
   const login = useCallback(async (email, password) => {
     setLoading(true);
     try {

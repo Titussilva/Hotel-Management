@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom';
 import {
   Hotel, LayoutDashboard, BedDouble, CalendarDays,
-  MessageSquareText, BadgePercent, ChartNoAxesCombined, Users,
+  MessageSquareText, BadgePercent, ChartNoAxesCombined,
   LogOut, Menu, Bell,
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
@@ -14,7 +14,6 @@ const adminLinks = [
   { to: '/admin/reviews',       icon: MessageSquareText,     label: 'Reviews'        },
   { to: '/admin/offers',        icon: BadgePercent,          label: 'Offers'         },
   { to: '/admin/analytics',     icon: ChartNoAxesCombined,   label: 'Analytics'      },
-  { to: '/admin/users',         icon: Users,                 label: 'Users'          },
 ];
 
 export function AdminLayout() {

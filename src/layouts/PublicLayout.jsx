@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, NavLink, Outlet } from 'react-router-dom';
+import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { Hotel, Menu, X, ChevronDown } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -12,7 +12,8 @@ const navLinks = [
 
 export function PublicLayout() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const { session, isAuthenticated, isAdmin, logout } = useAuth();
+  const { session, loading, isAuthenticated, isAdmin, logout } = useAuth();
+  const navigate = useNavigate();
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -43,18 +44,30 @@ export function PublicLayout() {
           </nav>
 
           <div className="flex items-center gap-3">
-            {isAuthenticated ? (
+            {loading ? (
+              <div className="h-9 w-24 animate-pulse rounded-lg bg-slate-100 hidden md:block"></div>
+            ) : isAuthenticated ? (
               <div className="hidden md:flex items-center gap-4">
-                <Link to={isAdmin ? "/admin" : "/dashboard"} className="flex items-center gap-2 rounded-full border border-slate-200 p-1 pr-3 hover:bg-slate-50 transition-colors">
+                {!isAdmin && (
+                  <Link to="/dashboard" className="text-sm font-medium text-slate-600 hover:text-pine transition-colors">
+                    My Bookings
+                  </Link>
+                )}
+                {isAdmin && (
+                  <Link to="/admin" className="text-sm font-medium text-slate-600 hover:text-pine transition-colors">
+                    Dashboard
+                  </Link>
+                )}
+                <div className="flex items-center gap-2 rounded-full border border-slate-200 p-1 pr-3 hover:bg-slate-50 transition-colors">
                   <div className="grid h-8 w-8 place-items-center rounded-full bg-pine text-white font-bold text-sm">
                     {session?.user?.name?.charAt(0)?.toUpperCase() || 'U'}
                   </div>
                   <span className="text-sm font-semibold text-slate-700">
-                    {isAdmin ? 'Admin' : 'Dashboard'}
+                    {session?.user?.name || 'Profile'}
                   </span>
-                </Link>
-                <button onClick={() => { logout(); window.location.href = '/'; }} className="text-sm font-medium text-slate-500 hover:text-coral transition-colors">
-                  Log out
+                </div>
+                <button onClick={() => { logout(); navigate('/'); }} className="text-sm font-medium text-slate-500 hover:text-coral transition-colors">
+                  Logout
                 </button>
               </div>
             ) : (

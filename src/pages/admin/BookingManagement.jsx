@@ -10,6 +10,7 @@ import toast from 'react-hot-toast';
 
 const TABS = [
   { value: 'all', label: 'All' },
+  { value: 'active', label: 'Active' },
   { value: 'upcoming', label: 'Upcoming' },
   { value: 'completed', label: 'Completed' },
   { value: 'cancelled', label: 'Cancelled' },

@@ -41,7 +41,6 @@ import BookingManagement from './pages/admin/BookingManagement';
 import ReviewsModeration from './pages/admin/ReviewsModeration';
 import OffersManagement from './pages/admin/OffersManagement';
 import Analytics from './pages/admin/Analytics';
-import UsersManagement from './pages/admin/UsersManagement';
 
 export default function App() {
   return (
@@ -87,7 +86,7 @@ export default function App() {
             <Route path="/admin/reviews" element={<ReviewsModeration />} />
             <Route path="/admin/offers" element={<OffersManagement />} />
             <Route path="/admin/analytics" element={<Analytics />} />
-            <Route path="/admin/users" element={<UsersManagement />} />
+            <Route path="/admin/users" element={<Navigate to="/admin" replace />} />
           </Route>
 
           {/* Catch-all */}

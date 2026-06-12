@@ -100,6 +100,11 @@ router.post(
         return res.status(400).json({ success: false, message: 'Check-out must be after check-in' });
       }
 
+      // Prevent booking in the past
+      if (new Date(checkIn) < new Date(new Date().setHours(0,0,0,0))) {
+        return res.status(400).json({ success: false, message: 'Check-in date cannot be in the past' });
+      }
+
       const room = await Room.findById(roomId);
       if (!room) return res.status(404).json({ success: false, message: 'Room not found' });
       if (guests > room.maxGuests) {
@@ -112,6 +117,20 @@ router.post(
       const booked = await bookedUnitsForRoom(room._id, checkIn, checkOut);
       if (booked >= room.totalUnits) {
         return res.status(409).json({ success: false, message: 'Room is not available for those dates' });
+      }
+
+      // Prevent duplicate booking by the same user
+      const existingBooking = await Booking.findOne({
+        user: req.user._id,
+        room: room._id,
+        status: { $ne: 'cancelled' },
+        $or: [
+          { checkIn: { $lt: checkOut }, checkOut: { $gt: checkIn } }
+        ]
+      });
+
+      if (existingBooking) {
+        return res.status(409).json({ success: false, message: 'You already have a booking for this room during these dates' });
       }
 
       const offer = offerCode ? await Offer.findOne({ code: String(offerCode).toUpperCase() }) : null;

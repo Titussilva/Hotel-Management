@@ -53,14 +53,21 @@ router.get('/bookings', async (req, res) => {
     const { status, search, page = 1, limit = 20 } = req.query;
     const query = {};
     if (status && status !== 'all') {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
       if (status === 'cancelled') {
         query.status = 'cancelled';
       } else if (status === 'completed') {
         query.status = { $ne: 'cancelled' };
-        query.checkOut = { $lt: new Date() };
+        query.checkOut = { $lt: today };
       } else if (status === 'upcoming') {
         query.status = { $ne: 'cancelled' };
-        query.checkIn = { $gte: new Date() };
+        query.checkIn = { $gt: today };
+      } else if (status === 'active') {
+        query.status = { $ne: 'cancelled' };
+        query.checkIn = { $lte: today };
+        query.checkOut = { $gte: today };
       }
     }
 
@@ -166,32 +173,6 @@ router.delete('/offers/:id', async (req, res) => {
   }
 });
 
-// ── USERS ─────────────────────────────────────────────────────────────────────
-router.get('/users', async (req, res) => {
-  try {
-    const users = await User.aggregate([
-      { $sort: { createdAt: -1 } },
-      {
-        $lookup: {
-          from: 'bookings',
-          localField: '_id',
-          foreignField: 'user',
-          as: 'bookings',
-        },
-      },
-      {
-        $project: {
-          password: 0,
-          totalBookings: { $size: '$bookings' },
-        },
-      },
-    ]);
-    res.json({ success: true, users });
-  } catch (error) {
-    handleAdminError(res, error);
-  }
-});
-
 // ── ANALYTICS ─────────────────────────────────────────────────────────────────
 router.get('/analytics', async (_req, res) => {
   try {
@@ -203,7 +184,7 @@ router.get('/analytics', async (_req, res) => {
         { $group: { _id: null, total: { $sum: '$total' } } },
       ]),
       Review.aggregate([{ $group: { _id: '$status', count: { $sum: 1 } } }]),
-      Room.find({ isActive: { $ne: false } }),
+      Room.find({ isActive: true }),
       Booking.countDocuments({ status: { $ne: 'cancelled' }, checkIn: { $lte: now }, checkOut: { $gt: now } }),
       Review.aggregate([
         { $group: { _id: null, avg: { $avg: '$rating' } } },

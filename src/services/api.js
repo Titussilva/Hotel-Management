@@ -109,9 +109,6 @@ export const adminAPI = {
   updateOffer:  (id, data) => api.put(`/admin/offers/${id}`, data).then((r) => r.data),
   deleteOffer:  (id) => api.delete(`/admin/offers/${id}`).then((r) => r.data),
 
-  // Users
-  listUsers: () => api.get('/admin/users').then((r) => r.data),
-
   // Analytics
   analytics: () => api.get('/admin/analytics').then((r) => r.data),
 };
