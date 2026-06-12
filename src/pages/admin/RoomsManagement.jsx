@@ -174,8 +174,7 @@ export default function RoomsManagement() {
         </>
       )}
 
-      {/* Create/Edit Modal */}
-      <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={editRoom ? 'Edit room' : 'Add new room'} size="lg">
+            <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={editRoom ? 'Edit room' : 'Add new room'} size="lg">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
           <div className="grid gap-4 sm:grid-cols-2">
             <div>

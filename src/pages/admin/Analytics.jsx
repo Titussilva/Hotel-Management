@@ -42,8 +42,7 @@ export default function Analytics() {
         <p className="page-subtitle">Revenue, occupancy, and performance insights.</p>
       </div>
 
-      {/* KPI stats */}
-      {!loading && (!data || data.totalBookings === 0) ? (
+            {!loading && (!data || data.totalBookings === 0) ? (
         <div className="flex flex-col items-center justify-center rounded-2xl bg-white py-16 shadow-soft text-center">
           <TrendingUp size={40} className="text-slate-300" />
           <h3 className="mt-3 font-semibold text-ink">No analytics available</h3>
@@ -63,8 +62,7 @@ export default function Analytics() {
             ))}
       </div>
 
-      {/* Charts */}
-      {data?.monthlyData?.length > 0 && (
+            {data?.monthlyData?.length > 0 && (
         <div className="mt-8 grid gap-6 xl:grid-cols-2">
           <div className="card p-5">
             <h3 className="font-semibold text-ink mb-5">Monthly bookings trend</h3>
@@ -94,8 +92,7 @@ export default function Analytics() {
         </div>
       )}
 
-      {/* Pie + top rooms */}
-      <div className="mt-6 grid gap-6 xl:grid-cols-2">
+            <div className="mt-6 grid gap-6 xl:grid-cols-2">
         {reviewPieData.length > 0 && (
           <div className="card p-5">
             <h3 className="font-semibold text-ink mb-5">Review status breakdown</h3>

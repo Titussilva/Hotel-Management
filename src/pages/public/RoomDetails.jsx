@@ -82,10 +82,8 @@ export default function RoomDetails() {
         </div>
 
         <div className="grid gap-8 lg:grid-cols-[1fr_380px]">
-          {/* Left column */}
-          <div>
-            {/* Image gallery */}
-            <div className="relative overflow-hidden rounded-2xl">
+                    <div>
+                        <div className="relative overflow-hidden rounded-2xl">
               <img
                 className="h-80 w-full object-cover sm:h-96"
                 src={room.images?.[0] || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800'}
@@ -100,8 +98,7 @@ export default function RoomDetails() {
               )}
             </div>
 
-            {/* Room info */}
-            <div className="mt-6">
+                        <div className="mt-6">
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div>
                   <h1 className="text-3xl font-bold text-ink">{room.name}</h1>
@@ -118,8 +115,7 @@ export default function RoomDetails() {
 
               <p className="mt-4 text-slate-600 leading-7">{room.description}</p>
 
-              {/* Details grid */}
-              <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+                            <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
                 {[
                   { icon: <BedDouble size={18} />, label: 'Bed type', value: room.bedType },
                   { icon: <Users size={18} />, label: 'Max guests', value: `${room.maxGuests} guests` },
@@ -134,8 +130,7 @@ export default function RoomDetails() {
                 ))}
               </div>
 
-              {/* Amenities */}
-              <div className="mt-6">
+                            <div className="mt-6">
                 <h3 className="font-semibold text-ink mb-3">Amenities</h3>
                 <div className="flex flex-wrap gap-2">
                   {room.amenities?.map((a) => (
@@ -144,8 +139,7 @@ export default function RoomDetails() {
                 </div>
               </div>
 
-              {/* Reviews */}
-              <div className="mt-8">
+                            <div className="mt-8">
                 <h3 className="font-semibold text-ink mb-4">Guest reviews ({reviews.length})</h3>
                 {reviews.length === 0 ? (
                   <p className="text-sm text-slate-500">No reviews yet. Be the first to leave one after your stay.</p>
@@ -169,8 +163,7 @@ export default function RoomDetails() {
                   </div>
                 )}
 
-                {/* Review form */}
-                {isAuthenticated && (
+                                {isAuthenticated && (
                   <form onSubmit={handleSubmit(onReviewSubmit)} className="mt-6 rounded-xl border border-slate-200 p-5">
                     <h4 className="font-semibold text-ink mb-4">Write a review</h4>
                     <div className="space-y-4">
@@ -198,8 +191,7 @@ export default function RoomDetails() {
             </div>
           </div>
 
-          {/* Right — booking card */}
-          <div className="lg:sticky lg:top-24 h-fit">
+                    <div className="lg:sticky lg:top-24 h-fit">
             <div className="card p-6">
               <div className="text-3xl font-bold text-ink">
                 {money(room.price)}

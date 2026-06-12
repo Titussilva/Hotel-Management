@@ -39,20 +39,18 @@ export default function Dashboard() {
     }).finally(() => setLoading(false));
   }, []);
 
-  const upcoming  = bookings.filter((b) => b.status === 'upcoming');
+  const upcoming  = bookings.filter((b) => b.status === 'upcoming' || b.status === 'active');
   const completed = bookings.filter((b) => b.status === 'completed');
   const totalSpent = bookings.filter((b) => b.paymentStatus === 'paid').reduce((s, b) => s + (b.total || 0), 0);
   const unread = notifs.filter((n) => !n.read).length;
 
   return (
     <div className="p-6 lg:p-8">
-      {/* Header */}
       <div className="mb-8">
         <h1 className="page-title">Good {new Date().getHours() < 12 ? 'morning' : 'evening'}, {session?.user?.name?.split(' ')[0]}! 👋</h1>
         <p className="page-subtitle mt-1">Here's an overview of your bookings and account.</p>
       </div>
 
-      {/* Stats */}
       <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard icon={<CalendarDays size={22} />} label="Upcoming stays" value={upcoming.length} color="pine" loading={loading} />
         <StatCard icon={<BedDouble size={22} />} label="Total bookings" value={bookings.length} sub={`${completed.length} completed`} color="blue" loading={loading} />
@@ -60,7 +58,6 @@ export default function Dashboard() {
         <StatCard icon={<Bell size={22} />} label="Notifications" value={unread} sub="unread" color="coral" loading={loading} />
       </div>
 
-      {/* Quick actions */}
       <div className="mt-8 grid gap-4 sm:grid-cols-3">
         <Link to="/hotels" className="flex items-center gap-4 rounded-xl bg-pine text-white p-5 transition-transform hover:scale-[1.01]">
           <div className="grid h-12 w-12 place-items-center rounded-xl bg-white/20"><BedDouble size={24} /></div>
@@ -85,7 +82,6 @@ export default function Dashboard() {
         </Link>
       </div>
 
-      {/* Recent bookings */}
       <div className="mt-8">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-lg font-bold text-ink">Recent bookings</h2>

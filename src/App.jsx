@@ -3,16 +3,13 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import { ToastProvider } from './components/ui/Toast';
 
-// Layouts
 import { PublicLayout } from './layouts/PublicLayout';
 import { DashboardLayout } from './layouts/DashboardLayout';
 import { AdminLayout } from './layouts/AdminLayout';
 
-// Route guards
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { AdminRoute } from './components/AdminRoute';
 
-// Public pages
 import Home from './pages/public/Home';
 import Hotels from './pages/public/Hotels';
 import RoomDetails from './pages/public/RoomDetails';
@@ -21,7 +18,6 @@ import Offers from './pages/public/Offers';
 import Login from './pages/public/Login';
 import Register from './pages/public/Register';
 
-// User pages
 import Dashboard from './pages/user/Dashboard';
 import MyBookings from './pages/user/MyBookings';
 import BookingDetails from './pages/user/BookingDetails';
@@ -30,11 +26,9 @@ import Profile from './pages/user/Profile';
 import Notifications from './pages/user/Notifications';
 import Settings from './pages/user/Settings';
 
-// Booking flow
 import Checkout from './pages/booking/Checkout';
 import BookingSuccess from './pages/booking/BookingSuccess';
 
-// Admin pages
 import AdminDashboard from './pages/admin/AdminDashboard';
 import RoomsManagement from './pages/admin/RoomsManagement';
 import BookingManagement from './pages/admin/BookingManagement';
@@ -48,8 +42,7 @@ export default function App() {
       <AuthProvider>
         <ToastProvider />
         <Routes>
-          {/* Public routes */}
-          <Route element={<PublicLayout />}>
+                    <Route element={<PublicLayout />}>
             <Route path="/" element={<Home />} />
             <Route path="/hotels" element={<Hotels />} />
             <Route path="/rooms/:id" element={<RoomDetails />} />
@@ -57,17 +50,14 @@ export default function App() {
             <Route path="/offers" element={<Offers />} />
           </Route>
 
-          {/* Auth routes (no layout) */}
-          <Route path="/login" element={<Login />} />
+                    <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
 
-          {/* Booking success (standalone) */}
-          <Route path="/booking/success" element={
+                    <Route path="/booking/success" element={
             <ProtectedRoute><BookingSuccess /></ProtectedRoute>
           } />
 
-          {/* Protected user routes */}
-          <Route element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
+                    <Route element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/dashboard/bookings" element={<MyBookings />} />
             <Route path="/bookings/:id" element={<BookingDetails />} />
@@ -78,8 +68,7 @@ export default function App() {
             <Route path="/settings" element={<Settings />} />
           </Route>
 
-          {/* Admin routes */}
-          <Route element={<AdminRoute><AdminLayout /></AdminRoute>}>
+                    <Route element={<AdminRoute><AdminLayout /></AdminRoute>}>
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/admin/rooms" element={<RoomsManagement />} />
             <Route path="/admin/bookings" element={<BookingManagement />} />
@@ -89,8 +78,7 @@ export default function App() {
             <Route path="/admin/users" element={<Navigate to="/admin" replace />} />
           </Route>
 
-          {/* Catch-all */}
-          <Route path="*" element={<Navigate to="/" replace />} />
+                    <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </AuthProvider>
     </BrowserRouter>

@@ -61,8 +61,7 @@ export default function BookingDetails() {
       <Breadcrumbs items={[{ href: '/dashboard', label: 'Dashboard' }, { href: '/dashboard/bookings', label: 'My Bookings' }, { label: `#${String(booking._id).slice(-8).toUpperCase()}` }]} />
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_320px]">
-        {/* Main details */}
-        <div className="card p-6">
+                <div className="card p-6">
           <div className="flex items-start justify-between mb-5">
             <div>
               <h1 className="text-2xl font-bold text-ink">{booking.room?.name || 'Room'}</h1>
@@ -100,8 +99,7 @@ export default function BookingDetails() {
           )}
         </div>
 
-        {/* Summary card */}
-        <div className="card p-6">
+                <div className="card p-6">
           <h3 className="font-semibold text-ink mb-4">Payment summary</h3>
           <div className="space-y-3 text-sm">
             <div className="flex justify-between">

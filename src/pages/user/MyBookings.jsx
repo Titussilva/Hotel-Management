@@ -68,7 +68,6 @@ export default function MyBookings() {
         </div>
       </div>
 
-      {/* Tabs */}
       <div className="mb-5 flex flex-wrap gap-2">
         {TABS.map((t) => (
           <button key={t.value}
@@ -82,7 +81,6 @@ export default function MyBookings() {
         ))}
       </div>
 
-      {/* Search */}
       <div className="mb-5 relative max-w-sm">
         <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
         <input className="input-field pl-9" placeholder="Search by booking ID or room name…"

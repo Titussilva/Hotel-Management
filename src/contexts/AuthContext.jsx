@@ -40,14 +40,14 @@ export function AuthProvider({ children }) {
   const login = useCallback(async (email, password) => {
     setLoading(true);
     try {
-      // Try real API first
+      
       const data = await authAPI.login({ email, password });
       const sess = { token: data.token, user: data.user };
       localStorage.setItem('stayease-session', JSON.stringify(sess));
       setSession(sess);
       return sess;
     } catch (error) {
-      // Demo mode fallback
+      
       if (email === 'guest@stayease.test' && password === 'password123') {
         const demoSess = {
           token: 'demo-token',

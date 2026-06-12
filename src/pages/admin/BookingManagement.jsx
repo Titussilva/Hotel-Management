@@ -65,7 +65,6 @@ export default function BookingManagement() {
         <p className="page-subtitle">{globalTotal} total bookings</p>
       </div>
 
-      {/* Tabs */}
       <div className="mb-4 flex flex-wrap gap-2">
         {TABS.map((t) => (
           <button key={t.value}
@@ -76,7 +75,6 @@ export default function BookingManagement() {
         ))}
       </div>
 
-      {/* Search */}
       <div className="mb-5 relative max-w-sm">
         <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
         <input className="input-field pl-9" placeholder="Search booking, room or guest…"

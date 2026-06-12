@@ -29,3 +29,17 @@ export function calculateDiscount(offer, subtotal, nights) {
 
   return Math.round(subtotal * (offer.discountValue / 100));
 }
+
+export function getBookingStatus(checkInDate, checkOutDate, currentStatus) {
+  if (currentStatus === 'cancelled') return 'cancelled';
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const checkIn = new Date(checkInDate);
+  checkIn.setHours(0, 0, 0, 0);
+  const checkOut = new Date(checkOutDate);
+  checkOut.setHours(0, 0, 0, 0);
+  
+  if (today < checkIn) return 'upcoming';
+  if (today <= checkOut) return 'active';
+  return 'completed';
+}

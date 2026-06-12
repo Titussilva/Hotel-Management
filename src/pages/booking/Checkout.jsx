@@ -122,8 +122,7 @@ export default function Checkout() {
       <Breadcrumbs items={[{ href: '/hotels', label: 'Hotels' }, { label: 'Checkout' }]} />
 
       <div className="mt-6 grid gap-8 lg:grid-cols-[1fr_380px]">
-        {/* Form */}
-        <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-6">
+                <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-6">
           <div className="card p-6">
             <h2 className="text-xl font-bold text-ink mb-5">Guest details</h2>
             <div className="grid gap-4 sm:grid-cols-2">
@@ -191,8 +190,7 @@ export default function Checkout() {
           </Button>
         </form>
 
-        {/* Order summary */}
-        <div className="card p-6 h-fit lg:sticky lg:top-24">
+                <div className="card p-6 h-fit lg:sticky lg:top-24">
           <img src={room.images?.[0]} alt={room.name} className="h-44 w-full rounded-xl object-cover" />
           <h3 className="mt-4 text-lg font-bold text-ink">{room.name}</h3>
           <p className="text-sm text-slate-500">{room.type} · {room.bedType}</p>

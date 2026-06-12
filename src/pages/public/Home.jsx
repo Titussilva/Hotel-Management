@@ -34,8 +34,7 @@ export default function Home() {
 
   return (
     <div>
-      {/* ── Hero ── */}
-      <section className="relative min-h-[92vh] overflow-hidden bg-ink">
+            <section className="relative min-h-[92vh] overflow-hidden bg-ink">
         <img className="absolute inset-0 h-full w-full object-cover opacity-65" src={HERO_IMAGE} alt="Luxury hotel" />
         <div className="absolute inset-0 bg-gradient-to-r from-ink via-ink/70 to-transparent" />
         <div className="relative mx-auto flex min-h-[92vh] max-w-7xl flex-col px-5 py-5 sm:px-8">
@@ -58,8 +57,7 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Quick search card */}
-            <div className="rounded-2xl bg-white p-6 shadow-2xl">
+                        <div className="rounded-2xl bg-white p-6 shadow-2xl">
               <div className="mb-5 flex items-center justify-between">
                 <h2 className="text-lg font-bold text-ink">Quick search</h2>
                 <Search size={20} className="text-pine" />
@@ -92,8 +90,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── Features ── */}
-      <section className="bg-white py-16">
+            <section className="bg-white py-16">
         <div className="mx-auto max-w-7xl px-5 sm:px-8">
           <div className="grid gap-8 md:grid-cols-3">
             {FEATURES.map((f) => (
@@ -109,8 +106,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── Featured Rooms ── */}
-      <section className="py-16">
+            <section className="py-16">
         <div className="mx-auto max-w-7xl px-5 sm:px-8">
           <div className="mb-10 flex items-end justify-between">
             <div>
@@ -131,8 +127,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── Offers ── */}
-      {offers.length > 0 && (
+            {offers.length > 0 && (
         <section className="bg-ink py-16">
           <div className="mx-auto max-w-7xl px-5 sm:px-8">
             <div className="mb-10 flex items-end justify-between">
@@ -160,8 +155,7 @@ export default function Home() {
         </section>
       )}
 
-      {/* ── CTA ── */}
-      <section className="py-20">
+            <section className="py-20">
         <div className="mx-auto max-w-3xl px-5 text-center">
           <h2 className="text-4xl font-bold text-ink">Ready to book your dream stay?</h2>
           <p className="mt-4 text-lg text-slate-500">Join thousands of guests who trust StayEase for seamless hotel bookings.</p>

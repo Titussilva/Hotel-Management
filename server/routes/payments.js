@@ -42,7 +42,6 @@ function rzpErrorMessage(e) {
   return 'Razorpay request failed';
 }
 
-// CREATE ORDER
 router.post('/create-order', requireAuth, async (req, res) => {
   try {
     const {
@@ -135,7 +134,6 @@ router.post('/create-order', requireAuth, async (req, res) => {
   }
 });
 
-// VERIFY PAYMENT
 router.post('/verify', requireAuth, async (req, res) => {
   try {
     const {

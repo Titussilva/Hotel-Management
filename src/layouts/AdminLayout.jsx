@@ -81,13 +81,11 @@ export function AdminLayout() {
 
   return (
     <div className="flex h-screen overflow-hidden bg-[#f6f8f5]">
-      {/* Desktop sidebar */}
-      <aside className="hidden w-60 flex-shrink-0 flex-col bg-ink lg:flex">
+            <aside className="hidden w-60 flex-shrink-0 flex-col bg-ink lg:flex">
         <SidebarContent />
       </aside>
 
-      {/* Mobile overlay */}
-      {sidebarOpen && (
+            {sidebarOpen && (
         <div className="fixed inset-0 z-50 lg:hidden">
           <div className="absolute inset-0 bg-ink/60" onClick={() => setSidebarOpen(false)} />
           <aside className="absolute left-0 top-0 flex h-full w-64 flex-col bg-ink shadow-2xl">

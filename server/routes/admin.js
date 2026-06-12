@@ -5,6 +5,7 @@ import Review from '../models/Review.js';
 import Room from '../models/Room.js';
 import User from '../models/User.js';
 import { requireAdmin, requireAuth } from '../middleware/auth.js';
+import { getBookingStatus } from '../utils/booking.js';
 
 const router = express.Router();
 router.use(requireAuth, requireAdmin);
@@ -17,7 +18,6 @@ const handleAdminError = (res, error) => {
   return res.status(500).json({ success: false, message: 'Admin request failed', detail: error.message });
 };
 
-// ── ROOMS ─────────────────────────────────────────────────────────────────────
 router.post('/rooms', async (req, res) => {
   try {
     const room = await Room.create(req.body);
@@ -47,7 +47,6 @@ router.delete('/rooms/:id', async (req, res) => {
   }
 });
 
-// ── BOOKINGS ──────────────────────────────────────────────────────────────────
 router.get('/bookings', async (req, res) => {
   try {
     const { status, search, page = 1, limit = 20 } = req.query;
@@ -86,11 +85,17 @@ router.get('/bookings', async (req, res) => {
           b.user?.email?.toLowerCase().includes(term),
       );
     }
+    
+    const mappedBookings = bookings.map(b => {
+      const obj = b.toObject();
+      obj.status = getBookingStatus(obj.checkIn, obj.checkOut, obj.status);
+      return obj;
+    });
 
-    const total = bookings.length;
+    const total = mappedBookings.length;
     const globalTotal = await Booking.countDocuments();
     const start = (Number(page) - 1) * Number(limit);
-    const paginated = bookings.slice(start, start + Number(limit));
+    const paginated = mappedBookings.slice(start, start + Number(limit));
 
     res.json({ success: true, data: paginated, total, globalTotal, page: Number(page), limit: Number(limit) });
   } catch (error) {
@@ -108,7 +113,6 @@ router.patch('/bookings/:id', async (req, res) => {
   }
 });
 
-// ── REVIEWS ───────────────────────────────────────────────────────────────────
 router.get('/reviews', async (req, res) => {
   try {
     const { status } = req.query;
@@ -135,7 +139,6 @@ router.patch('/reviews/:id', async (req, res) => {
   }
 });
 
-// ── OFFERS ────────────────────────────────────────────────────────────────────
 router.post('/offers', async (req, res) => {
   try {
     const offerData = { ...req.body };
@@ -173,7 +176,6 @@ router.delete('/offers/:id', async (req, res) => {
   }
 });
 
-// ── ANALYTICS ─────────────────────────────────────────────────────────────────
 router.get('/analytics', async (_req, res) => {
   try {
     const now = new Date();
@@ -194,7 +196,6 @@ router.get('/analytics', async (_req, res) => {
     const totalUnits = rooms.reduce((sum, room) => sum + (room.totalUnits || 1), 0);
     const occupancyRate = totalUnits ? Math.round((activeBookings / totalUnits) * 100) : 0;
 
-    // Monthly bookings + revenue for last 6 months
     const sixMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 5, 1);
     const monthlyAgg = await Booking.aggregate([
       { $match: { createdAt: { $gte: sixMonthsAgo }, status: { $ne: 'cancelled' } } },
@@ -212,10 +213,9 @@ router.get('/analytics', async (_req, res) => {
     const monthlyData = monthlyAgg.map((m) => ({
       month: monthNames[m._id.month - 1],
       bookings: m.bookings,
-      revenue: Math.round(m.revenue / 1000), // in thousands
+      revenue: Math.round(m.revenue / 1000), 
     }));
 
-    // Top 5 rooms by bookings
     const topRoomsAgg = await Booking.aggregate([
       { $match: { status: { $ne: 'cancelled' } } },
       { $group: { _id: '$room', count: { $sum: 1 } } },

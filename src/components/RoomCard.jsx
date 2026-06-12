@@ -17,16 +17,14 @@ export function RoomCard({ room, onFavorite, isFavorite, onSelect, selected }) {
           loading="lazy"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-ink/30 to-transparent" />
-        {/* Availability badge */}
-        <div className="absolute bottom-3 left-3">
+                <div className="absolute bottom-3 left-3">
           <span className={`rounded-md px-2.5 py-1 text-xs font-semibold text-white ${
             (room.availableUnits ?? 0) > 0 ? 'bg-emerald-600/90' : 'bg-red-600/90'
           }`}>
             {(room.availableUnits ?? 0) > 0 ? `${room.availableUnits} available` : 'Sold out'}
           </span>
         </div>
-        {/* Favorite button */}
-        {onFavorite && (
+                {onFavorite && (
           <button
             className="absolute right-3 top-3 grid h-9 w-9 place-items-center rounded-full bg-white/90 text-coral shadow-sm transition-all hover:bg-white hover:scale-110 active:scale-100"
             onClick={() => onFavorite(room)}
@@ -35,8 +33,7 @@ export function RoomCard({ room, onFavorite, isFavorite, onSelect, selected }) {
             <Heart size={18} fill={isFavorite ? 'currentColor' : 'none'} />
           </button>
         )}
-        {/* Room type */}
-        <div className="absolute right-3 bottom-3">
+                <div className="absolute right-3 bottom-3">
           <span className="rounded-md bg-white/90 px-2.5 py-1 text-xs font-semibold text-pine backdrop-blur-sm">
             {room.type}
           </span>

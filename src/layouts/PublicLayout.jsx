@@ -17,8 +17,7 @@ export function PublicLayout() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Navbar */}
-      <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur-md">
+            <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur-md">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-5 sm:px-8">
           <Link to="/" className="flex items-center gap-2.5">
             <span className="grid h-9 w-9 place-items-center rounded-lg bg-pine text-white">
@@ -27,8 +26,7 @@ export function PublicLayout() {
             <span className="text-lg font-bold text-ink">StayEase</span>
           </Link>
 
-          {/* Desktop nav */}
-          <nav className="hidden items-center gap-6 md:flex">
+                    <nav className="hidden items-center gap-6 md:flex">
             {navLinks.map((l) => (
               <NavLink
                 key={l.to}
@@ -86,8 +84,7 @@ export function PublicLayout() {
           </div>
         </div>
 
-        {/* Mobile menu */}
-        {menuOpen && (
+                {menuOpen && (
           <div className="border-t border-slate-100 bg-white px-5 py-4 md:hidden">
             {navLinks.map((l) => (
               <Link key={l.to} to={l.to} className="block py-2.5 text-sm font-medium text-slate-700" onClick={() => setMenuOpen(false)}>

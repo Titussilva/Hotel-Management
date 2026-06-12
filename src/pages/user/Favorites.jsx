@@ -36,7 +36,7 @@ export default function Favorites() {
     try {
       await authAPI.toggleFavorite(room._id);
       toast.success(`${room.name} removed from favorites`);
-    } catch { /* optimistic update */ }
+    } catch {  }
   }
 
   return (

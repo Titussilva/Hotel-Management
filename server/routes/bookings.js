@@ -6,7 +6,7 @@ import Offer from '../models/Offer.js';
 import Room from '../models/Room.js';
 import Notification from '../models/Notification.js';
 import { requireAuth } from '../middleware/auth.js';
-import { bookedUnitsForRoom, calculateDiscount, nightsBetween } from '../utils/booking.js';
+import { bookedUnitsForRoom, calculateDiscount, nightsBetween, getBookingStatus } from '../utils/booking.js';
 import { sendBookingEmail } from '../utils/mailer.js';
 
 const router = express.Router();
@@ -23,20 +23,21 @@ function handleValidationErrors(req, res) {
   return null;
 }
 
-// ── GET /bookings — user's bookings ──────────────────────────────────────────
 router.get('/', requireAuth, async (req, res) => {
   try {
     const { status, search } = req.query;
     const query = { user: req.user._id };
     if (status && status !== 'all') {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
       if (status === 'cancelled') {
         query.status = 'cancelled';
       } else if (status === 'completed') {
         query.status = { $ne: 'cancelled' };
-        query.checkOut = { $lt: new Date() };
+        query.checkOut = { $lt: today };
       } else if (status === 'upcoming') {
         query.status = { $ne: 'cancelled' };
-        query.checkIn = { $gte: new Date() };
+        query.checkOut = { $gte: today };
       }
     }
 
@@ -50,14 +51,19 @@ router.get('/', requireAuth, async (req, res) => {
           b.room?.name?.toLowerCase().includes(term),
       );
     }
+    
+    const mappedBookings = bookings.map(b => {
+      const obj = b.toObject();
+      obj.status = getBookingStatus(obj.checkIn, obj.checkOut, obj.status);
+      return obj;
+    });
 
-    res.json({ success: true, data: bookings });
+    res.json({ success: true, data: mappedBookings });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Could not load bookings', detail: error.message });
   }
 });
 
-// ── GET /bookings/:id — single booking detail ─────────────────────────────────
 router.get('/:id', requireAuth, async (req, res) => {
   try {
     if (!mongoose.isValidObjectId(req.params.id)) {
@@ -67,13 +73,14 @@ router.get('/:id', requireAuth, async (req, res) => {
       .populate('room')
       .populate('user', 'name email');
     if (!booking) return res.status(404).json({ success: false, message: 'Booking not found' });
-    res.json({ success: true, data: booking });
+    const obj = booking.toObject();
+    obj.status = getBookingStatus(obj.checkIn, obj.checkOut, obj.status);
+    res.json({ success: true, data: obj });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Could not load booking', detail: error.message });
   }
 });
 
-// ── POST /bookings — create booking (fallback / non-Razorpay) ────────────────
 router.post(
   '/',
   requireAuth,
@@ -100,7 +107,6 @@ router.post(
         return res.status(400).json({ success: false, message: 'Check-out must be after check-in' });
       }
 
-      // Prevent booking in the past
       if (new Date(checkIn) < new Date(new Date().setHours(0,0,0,0))) {
         return res.status(400).json({ success: false, message: 'Check-in date cannot be in the past' });
       }
@@ -119,7 +125,6 @@ router.post(
         return res.status(409).json({ success: false, message: 'Room is not available for those dates' });
       }
 
-      // Prevent duplicate booking by the same user
       const existingBooking = await Booking.findOne({
         user: req.user._id,
         room: room._id,
@@ -177,7 +182,9 @@ router.post(
       ]);
 
       const populatedBooking = await booking.populate('room');
-      res.status(201).json({ success: true, message: 'Booking created', data: { ...populatedBooking.toObject(), emailResult } });
+      const obj = populatedBooking.toObject();
+      obj.status = getBookingStatus(obj.checkIn, obj.checkOut, obj.status);
+      res.status(201).json({ success: true, message: 'Booking created', data: { ...obj, emailResult } });
     } catch (error) {
       console.error('Booking creation failed:', error);
       if (error.name === 'ValidationError') {
@@ -188,7 +195,6 @@ router.post(
   },
 );
 
-// ── PATCH /bookings/:id/cancel ────────────────────────────────────────────────
 router.patch('/:id/cancel', requireAuth, async (req, res) => {
   try {
     const booking = await Booking.findOne({ _id: req.params.id, user: req.user._id });

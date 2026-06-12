@@ -44,8 +44,7 @@ export default function AdminDashboard() {
         <p className="page-subtitle">Overview of hotel operations and performance.</p>
       </div>
 
-      {/* Stats */}
-      <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+            <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
         {loading
           ? Array.from({ length: 6 }).map((_, i) => <StatSkeleton key={i} />)
           : stats.map((s) => (
@@ -57,8 +56,7 @@ export default function AdminDashboard() {
             ))}
       </div>
 
-      {/* Charts */}
-      {analytics?.monthlyData?.length > 0 && (
+            {analytics?.monthlyData?.length > 0 && (
         <div className="mt-8 grid gap-6 lg:grid-cols-2">
           <div className="card p-5">
             <h3 className="font-semibold text-ink mb-4">Monthly bookings</h3>
@@ -87,8 +85,7 @@ export default function AdminDashboard() {
         </div>
       )}
 
-      {/* Top rooms */}
-      {analytics?.topRooms?.length > 0 && (
+            {analytics?.topRooms?.length > 0 && (
         <div className="mt-6 card p-5">
           <h3 className="font-semibold text-ink mb-4">Top booked rooms</h3>
           <div className="space-y-3">
@@ -108,8 +105,7 @@ export default function AdminDashboard() {
         </div>
       )}
 
-      {/* Recent bookings */}
-      <div className="mt-6 card p-5">
+            <div className="mt-6 card p-5">
         <div className="flex items-center justify-between mb-4">
           <h3 className="font-semibold text-ink">Recent bookings</h3>
           <Link to="/admin/bookings" className="text-sm font-semibold text-pine hover:underline">View all</Link>

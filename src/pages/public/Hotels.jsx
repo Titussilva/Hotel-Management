@@ -71,7 +71,7 @@ export default function Hotels() {
     setFavoriteIds(next);
     try {
       await authAPI.toggleFavorite(room._id);
-    } catch { /* optimistic update – silent */ }
+    } catch {  }
   }
 
   const f = (key, val) => setFilters((prev) => ({ ...prev, [key]: val }));
@@ -85,8 +85,7 @@ export default function Hotels() {
         </div>
 
         <div className="flex flex-col gap-8 lg:flex-row">
-          {/* Filters sidebar */}
-          <aside className="w-full shrink-0 lg:w-72">
+                    <aside className="w-full shrink-0 lg:w-72">
             <div className="card p-5 space-y-5 sticky top-24">
               <div className="flex items-center gap-2 font-semibold text-ink">
                 <SlidersHorizontal size={18} className="text-pine" /> Filters
@@ -125,8 +124,7 @@ export default function Hotels() {
             </div>
           </aside>
 
-          {/* Room grid */}
-          <div className="flex-1">
+                    <div className="flex-1">
             <div className="mb-4 flex items-center justify-between">
               <p className="text-sm text-slate-500">
                 {loading ? 'Searching…' : `${rooms.length} room${rooms.length !== 1 ? 's' : ''} found`}

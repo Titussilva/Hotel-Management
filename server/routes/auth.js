@@ -25,7 +25,6 @@ function handleValidationErrors(req, res) {
   return null;
 }
 
-// ── Register ──────────────────────────────────────────────────────────────────
 router.post(
   '/register',
   [
@@ -66,7 +65,6 @@ router.post(
   },
 );
 
-// ── Login ─────────────────────────────────────────────────────────────────────
 router.post(
   '/login',
   [
@@ -82,7 +80,7 @@ router.post(
       let user = await User.findOne({ email });
 
       if (!user) {
-        // Auto-create user if missing (to sync with demo accounts or first-time logins)
+        
         const hashed = await bcrypt.hash(password, 10);
         let name = email.split('@')[0];
         name = name.charAt(0).toUpperCase() + name.slice(1);
@@ -110,12 +108,10 @@ router.post(
   },
 );
 
-// ── Me ────────────────────────────────────────────────────────────────────────
 router.get('/me', requireAuth, (req, res) => {
   res.json({ success: true, user: req.user });
 });
 
-// ── Update Profile ────────────────────────────────────────────────────────────
 router.put(
   '/profile',
   requireAuth,
@@ -143,7 +139,6 @@ router.put(
   },
 );
 
-// ── Toggle Favorite ───────────────────────────────────────────────────────────
 router.patch('/favorites/:roomId', requireAuth, async (req, res) => {
   try {
     const roomId = req.params.roomId;

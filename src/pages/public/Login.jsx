@@ -19,7 +19,6 @@ export default function Login() {
   const navigate = useNavigate();
   const [showPw, setShowPw] = useState(false);
 
-  // Redirect if already logged in
   useEffect(() => {
     if (isAuthenticated) navigate(isAdmin ? '/admin' : '/dashboard', { replace: true });
   }, [isAuthenticated]);
@@ -41,8 +40,7 @@ export default function Login() {
 
   return (
     <div className="grid min-h-screen bg-ink lg:grid-cols-[1.1fr_0.9fr]">
-      {/* Left visual */}
-      <section className="relative hidden overflow-hidden lg:block">
+            <section className="relative hidden overflow-hidden lg:block">
         <img
           className="absolute inset-0 h-full w-full object-cover opacity-70"
           src="https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1800&q=80"
@@ -65,8 +63,7 @@ export default function Login() {
         </div>
       </section>
 
-      {/* Right form */}
-      <section className="flex items-center justify-center px-5 py-12 bg-[#f6f8f5]">
+            <section className="flex items-center justify-center px-5 py-12 bg-[#f6f8f5]">
         <div className="w-full max-w-md">
           <div className="mb-2 flex justify-center lg:hidden">
             <Link to="/" className="flex items-center gap-2 text-xl font-bold text-ink">

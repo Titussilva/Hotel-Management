@@ -59,8 +59,7 @@ export default function BookingSuccess() {
   return (
     <div className="min-h-screen bg-[#f6f8f5] flex items-center justify-center p-5">
       <div className="w-full max-w-lg">
-        {/* Success animation */}
-        <div className="text-center mb-8">
+                <div className="text-center mb-8">
           <div className="inline-grid h-24 w-24 place-items-center rounded-full bg-emerald-100 shadow-lg">
             <CheckCircle size={52} className="text-emerald-500" />
           </div>
@@ -68,8 +67,7 @@ export default function BookingSuccess() {
           <p className="mt-2 text-slate-500">Your room has been reserved. Check your email for details.</p>
         </div>
 
-        {/* Booking card */}
-        <div className="card p-6">
+                <div className="card p-6">
           <div className="flex items-center justify-between mb-5">
             <div>
               <p className="text-xs text-slate-400 font-semibold uppercase tracking-wide">Booking ID</p>
