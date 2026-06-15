@@ -3,10 +3,11 @@ import { Link, useNavigate } from 'react-router-dom';
 import { BedDouble, CalendarDays, Heart, Star, Users } from 'lucide-react';
 import { money } from '../utils/money';
 import { Button } from './ui/Button';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from '../contexts/AuthContext';
 
 export function RoomCard({ room, onFavorite, isFavorite, onSelect, selected }) {
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   return (
     <article className="group overflow-hidden rounded-xl bg-white shadow-soft transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5">
