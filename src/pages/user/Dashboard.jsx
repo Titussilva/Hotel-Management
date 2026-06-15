@@ -74,7 +74,7 @@ export default function Dashboard() {
               <div className="text-sm text-white/70">Start reservation</div>
             </div>
           </Link>
-        )
+        ) }
         <Link to="/search" className="flex items-center gap-4 rounded-xl bg-white p-5 shadow-soft transition-transform hover:scale-[1.01]">
           <div className="grid h-12 w-12 place-items-center rounded-xl bg-mist text-pine"><BedDouble size={24} /></div>
           <div>
