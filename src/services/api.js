@@ -51,6 +51,7 @@ export const authAPI = {
   me:       ()     => api.get('/auth/me').then((r) => r.data),
   updateProfile: (data) => api.put('/auth/profile', data).then((r) => r.data),
   toggleFavorite: (roomId) => api.patch(`/auth/favorites/${roomId}`).then((r) => r.data),
+  changePassword: (data) => api.put('/auth/change-password', data).then((r) => r.data),
 };
 
 export const roomsAPI = {

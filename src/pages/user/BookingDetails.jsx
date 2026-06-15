@@ -8,6 +8,7 @@ import { Button } from '../../components/ui/Button';
 import { money } from '../../utils/money';
 import { formatDate } from '../../utils/dates';
 import { Printer, BedDouble, Calendar, Users, CreditCard } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 export default function BookingDetails() {
   const { id } = useParams();
@@ -20,6 +21,20 @@ export default function BookingDetails() {
       .catch(() => {})
       .finally(() => setLoading(false));
   }, [id]);
+
+  async function handleCancel() {
+    if (!window.confirm('Cancel Booking?')) return;
+    try {
+      setLoading(true);
+      await bookingsAPI.cancel(id);
+      const res = await bookingsAPI.get(id);
+      setBooking(res.data || res);
+    } catch (e) {
+      toast.error('Cancellation failed');
+    } finally {
+      setLoading(false);
+    }
+  }
 
   if (loading) return <div className="flex min-h-[60vh] items-center justify-center"><Spinner size="xl" /></div>;
   if (!booking) return (
@@ -128,6 +143,14 @@ export default function BookingDetails() {
           <Link to="/dashboard/bookings" className="mt-3 block text-center text-sm font-medium text-slate-500 hover:text-pine">
             ← Back to bookings
           </Link>
+
+          {booking.status !== 'cancelled' && new Date(booking.checkIn) > new Date() && (
+            <div className="mt-6 border-t border-slate-100 pt-5">
+              <Button variant="danger" className="w-full justify-center bg-coral/10 text-coral hover:bg-coral hover:text-white" onClick={handleCancel}>
+                Cancel Reservation
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     </div>

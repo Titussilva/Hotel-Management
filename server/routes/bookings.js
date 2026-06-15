@@ -99,6 +99,10 @@ router.post(
       const { roomId, checkIn, checkOut, guests, guestDetails, specialRequests, offerCode, paymentMethod, emailTo } =
         req.body;
 
+      if (req.user.role === 'admin') {
+        return res.status(403).json({ success: false, message: 'Admins cannot create reservations' });
+      }
+
       if (!mongoose.isValidObjectId(roomId)) {
         return res.status(400).json({ success: false, message: 'Select a real room from the database before booking' });
       }

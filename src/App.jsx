@@ -9,6 +9,7 @@ import { AdminLayout } from './layouts/AdminLayout';
 
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { AdminRoute } from './components/AdminRoute';
+import { GuestOnlyRoute } from './components/GuestOnlyRoute';
 
 import Home from './pages/public/Home';
 import Hotels from './pages/public/Hotels';
@@ -50,8 +51,8 @@ export default function App() {
             <Route path="/offers" element={<Offers />} />
           </Route>
 
-                    <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+                    <Route path="/login" element={<GuestOnlyRoute><Login /></GuestOnlyRoute>} />
+          <Route path="/register" element={<GuestOnlyRoute><Register /></GuestOnlyRoute>} />
 
                     <Route path="/booking/success" element={
             <ProtectedRoute><BookingSuccess /></ProtectedRoute>

@@ -22,7 +22,7 @@ function StatCard({ icon, label, value, sub, color = 'pine', loading }) {
 }
 
 export default function Dashboard() {
-  const { session } = useAuth();
+  const { session, isAdmin } = useAuth();
   const [bookings, setBookings] = useState([]);
   const [notifs, setNotifs] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -62,15 +62,24 @@ export default function Dashboard() {
         <Link to="/hotels" className="flex items-center gap-4 rounded-xl bg-pine text-white p-5 transition-transform hover:scale-[1.01]">
           <div className="grid h-12 w-12 place-items-center rounded-xl bg-white/20"><BedDouble size={24} /></div>
           <div>
-            <div className="font-semibold">Browse rooms</div>
-            <div className="text-sm text-white/70">Find and book hotels</div>
+            <div className="font-semibold">Browse Hotels</div>
+            <div className="text-sm text-white/70">Book Now</div>
           </div>
         </Link>
-        <Link to="/dashboard/bookings" className="flex items-center gap-4 rounded-xl bg-white p-5 shadow-soft transition-transform hover:scale-[1.01]">
-          <div className="grid h-12 w-12 place-items-center rounded-xl bg-mist text-pine"><CalendarDays size={24} /></div>
+        {!isAdmin && (
+          <Link to="/hotels" className="flex items-center gap-4 rounded-xl bg-emerald-600 text-white p-5 transition-transform hover:scale-[1.01]">
+            <div className="grid h-12 w-12 place-items-center rounded-xl bg-white/20"><BedDouble size={24} /></div>
+            <div>
+              <div className="font-semibold">Book Now</div>
+              <div className="text-sm text-white/70">Start reservation</div>
+            </div>
+          </Link>
+        )
+        <Link to="/search" className="flex items-center gap-4 rounded-xl bg-white p-5 shadow-soft transition-transform hover:scale-[1.01]">
+          <div className="grid h-12 w-12 place-items-center rounded-xl bg-mist text-pine"><BedDouble size={24} /></div>
           <div>
-            <div className="font-semibold text-ink">My bookings</div>
-            <div className="text-sm text-slate-500">View & manage stays</div>
+            <div className="font-semibold text-ink">Search Hotels</div>
+            <div className="text-sm text-slate-500">Find your perfect stay</div>
           </div>
         </Link>
         <Link to="/favorites" className="flex items-center gap-4 rounded-xl bg-white p-5 shadow-soft transition-transform hover:scale-[1.01]">

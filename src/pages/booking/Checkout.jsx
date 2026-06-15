@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useAuth } from '../../contexts/AuthContext';
-import { paymentsAPI } from '../../services/api';
+import { paymentsAPI, offersAPI } from '../../services/api';
 import { Button } from '../../components/ui/Button';
 import { Breadcrumbs } from '../../components/Breadcrumbs';
 import { money } from '../../utils/money';
@@ -36,6 +36,9 @@ export default function Checkout() {
   const room = state?.room;
   const [paying, setPaying] = useState(false);
   const [offerDiscount, setOfferDiscount] = useState(0);
+  const [offerData, setOfferData] = useState(null);
+  const [offerError, setOfferError] = useState('');
+  const [validatingOffer, setValidatingOffer] = useState(false);
 
   if (!room) {
     navigate('/hotels', { replace: true });
@@ -61,6 +64,52 @@ export default function Checkout() {
   const nights = nightsBetween(watchedCheckIn, watchedCheckOut);
   const subtotal = room.price * nights;
   const total = Math.max(0, subtotal - offerDiscount);
+
+  React.useEffect(() => {
+    if (offerData) {
+      if (nights < (offerData.minStayNights || 1)) {
+        setOfferError(`Requires minimum stay of ${offerData.minStayNights} nights`);
+        setOfferDiscount(0);
+      } else {
+        setOfferError('');
+        if (offerData.discountType === 'fixed') {
+          setOfferDiscount(Math.min(subtotal, offerData.discountValue));
+        } else {
+          setOfferDiscount(Math.round(subtotal * (offerData.discountValue / 100)));
+        }
+      }
+    }
+  }, [nights, subtotal, offerData]);
+
+  async function handleApplyOffer() {
+    const code = watch('offerCode');
+    if (!code) return;
+    setValidatingOffer(true);
+    setOfferError('');
+    try {
+      const offer = await offersAPI.validate(code);
+      if (nights < (offer.minStayNights || 1)) {
+        setOfferError(`Requires minimum stay of ${offer.minStayNights} nights`);
+        setOfferData(null);
+        setOfferDiscount(0);
+        return;
+      }
+      setOfferData(offer);
+      let disc = 0;
+      if (offer.discountType === 'fixed') {
+        disc = Math.min(subtotal, offer.discountValue);
+      } else {
+        disc = Math.round(subtotal * (offer.discountValue / 100));
+      }
+      setOfferDiscount(disc);
+    } catch (e) {
+      setOfferError(e.message || 'Invalid or expired offer code');
+      setOfferData(null);
+      setOfferDiscount(0);
+    } finally {
+      setValidatingOffer(false);
+    }
+  }
 
   function openRazorpay(orderData, method, bookingPayload) {
     return new Promise((resolve, reject) => {
@@ -176,7 +225,19 @@ export default function Checkout() {
             </div>
             <div className="mt-4">
               <label className="label">Offer / discount code</label>
-              <input className="input-field" placeholder="E.g. WEEKEND20" {...register('offerCode')} />
+              <div className="flex gap-2">
+                <input className="input-field" placeholder="E.g. WEEKEND20" {...register('offerCode')} />
+                <Button type="button" onClick={handleApplyOffer} loading={validatingOffer} variant="secondary">Apply</Button>
+              </div>
+              {offerError && <p className="mt-1 text-xs text-red-500">{offerError}</p>}
+              {offerData && !offerError && (
+                <div className="mt-2 rounded-lg bg-emerald-50 p-3 text-sm text-emerald-700">
+                  <p className="font-semibold">✓ Coupon Applied</p>
+                  <p>Code: {offerData.code}</p>
+                  <p>Discount: {offerData.discountType === 'fixed' ? money(offerData.discountValue) : `${offerData.discountValue}%`}</p>
+                  <p>Saved Amount: {money(offerDiscount)}</p>
+                </div>
+              )}
             </div>
           </div>
 

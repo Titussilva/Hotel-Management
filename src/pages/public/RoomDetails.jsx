@@ -23,7 +23,7 @@ const reviewSchema = z.object({
 export default function RoomDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { session, isAuthenticated } = useAuth();
+  const { session, isAuthenticated, isAdmin } = useAuth();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [submittingReview, setSubmittingReview] = useState(false);
@@ -192,39 +192,45 @@ export default function RoomDetails() {
           </div>
 
                     <div className="lg:sticky lg:top-24 h-fit">
-            <div className="card p-6">
-              <div className="text-3xl font-bold text-ink">
-                {money(room.price)}
-                <span className="text-base font-normal text-slate-400"> / night</span>
+            {!isAdmin ? (
+              <div className="card p-6">
+                <div className="text-3xl font-bold text-ink">
+                  {money(room.price)}
+                  <span className="text-base font-normal text-slate-400"> / night</span>
+                </div>
+                <div className="mt-5 space-y-3">
+                  <div>
+                    <label className="label">Select dates</label>
+                    <input type="date" className="input-field" value={checkIn} min={today()}
+                      onChange={(e) => setCheckIn(e.target.value)} />
+                  </div>
+                  <div>
+                    <label className="label">Check availability</label>
+                    <input type="date" className="input-field" value={checkOut} min={checkIn}
+                      onChange={(e) => setCheckOut(e.target.value)} />
+                  </div>
+                </div>
+                <div className="mt-5 rounded-xl bg-mist p-4 text-sm">
+                  <div className="flex justify-between text-slate-600 mb-1">
+                    <span>Room rate</span>
+                    <span>{money(room.price)} / night</span>
+                  </div>
+                  <div className="flex justify-between font-semibold text-ink border-t border-slate-200 pt-2 mt-2">
+                    <span>Total (estimated)</span>
+                    <span>{money(room.price * Math.max(1, Math.ceil((new Date(checkOut) - new Date(checkIn)) / 86400000)))}</span>
+                  </div>
+                </div>
+                <Button className="mt-4 w-full justify-center py-3 text-base" onClick={handleBook}
+                  disabled={(room.availableUnits ?? room.totalUnits) <= 0}>
+                  {(room.availableUnits ?? room.totalUnits) <= 0 ? 'Sold out' : 'Reserve room'}
+                </Button>
+                <p className="mt-3 text-center text-xs text-slate-400">No charge until confirmed</p>
               </div>
-              <div className="mt-5 space-y-3">
-                <div>
-                  <label className="label">Check in</label>
-                  <input type="date" className="input-field" value={checkIn} min={today()}
-                    onChange={(e) => setCheckIn(e.target.value)} />
-                </div>
-                <div>
-                  <label className="label">Check out</label>
-                  <input type="date" className="input-field" value={checkOut} min={checkIn}
-                    onChange={(e) => setCheckOut(e.target.value)} />
-                </div>
+            ) : (
+              <div className="card p-6 text-center">
+                <p className="text-sm font-semibold text-slate-500">Admins cannot create reservations</p>
               </div>
-              <div className="mt-5 rounded-xl bg-mist p-4 text-sm">
-                <div className="flex justify-between text-slate-600 mb-1">
-                  <span>Room rate</span>
-                  <span>{money(room.price)} / night</span>
-                </div>
-                <div className="flex justify-between font-semibold text-ink border-t border-slate-200 pt-2 mt-2">
-                  <span>Total (estimated)</span>
-                  <span>{money(room.price * Math.max(1, Math.ceil((new Date(checkOut) - new Date(checkIn)) / 86400000)))}</span>
-                </div>
-              </div>
-              <Button className="mt-4 w-full justify-center py-3 text-base" onClick={handleBook}
-                disabled={(room.availableUnits ?? room.totalUnits) <= 0}>
-                {(room.availableUnits ?? room.totalUnits) <= 0 ? 'Sold out' : 'Reserve now'}
-              </Button>
-              <p className="mt-3 text-center text-xs text-slate-400">No charge until confirmed</p>
-            </div>
+            )}
           </div>
         </div>
       </div>

@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { BedDouble, CalendarDays, Heart, Star, Users } from 'lucide-react';
 import { money } from '../utils/money';
 import { Button } from './ui/Button';
+import { useAuth } from '../../contexts/AuthContext';
 
 export function RoomCard({ room, onFavorite, isFavorite, onSelect, selected }) {
   const navigate = useNavigate();
@@ -76,16 +77,16 @@ export function RoomCard({ room, onFavorite, isFavorite, onSelect, selected }) {
               size="sm"
               onClick={() => navigate(`/rooms/${room._id}`)}
             >
-              Details
+              View Details
             </Button>
-            {onSelect && (
+            {onSelect && user?.role !== 'admin' && (
               <Button
                 variant={selected ? 'dark' : 'primary'}
                 size="sm"
                 disabled={(room.availableUnits ?? 0) <= 0}
                 onClick={() => onSelect(room)}
               >
-                {selected ? 'Selected' : 'Select'}
+                {selected ? 'Selected' : 'Book Now'}
               </Button>
             )}
           </div>
