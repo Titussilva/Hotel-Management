@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ShieldCheck, Star, BedDouble, ChevronRight, BadgePercent, Search } from 'lucide-react';
 import { roomsAPI, offersAPI } from '../../services/api';
+import { useAuth } from '../../contexts/AuthContext';
 import { RoomCard, EmptyRooms } from '../../components/RoomCard';
 import { CardSkeleton } from '../../components/ui/Skeleton';
 import { money } from '../../utils/money';
@@ -16,6 +17,7 @@ const FEATURES = [
 ];
 
 export default function Home() {
+  const { isAuthenticated } = useAuth();
   const [rooms, setRooms] = useState([]);
   const [offers, setOffers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -51,9 +53,11 @@ export default function Home() {
               </p>
               <div className="mt-8 flex flex-wrap gap-3">
                 <Link to="/hotels" className="btn-primary text-base px-6 py-3">Browse all rooms</Link>
-                <Link to="/register" className="inline-flex items-center gap-2 rounded-lg border border-white/30 px-6 py-3 text-base font-semibold text-white hover:bg-white/10 transition-all">
-                  Create account
-                </Link>
+                {!isAuthenticated && (
+                  <Link to="/register" className="inline-flex items-center gap-2 rounded-lg border border-white/30 px-6 py-3 text-base font-semibold text-white hover:bg-white/10 transition-all">
+                    Create account
+                  </Link>
+                )}
               </div>
             </div>
 
@@ -160,7 +164,9 @@ export default function Home() {
           <h2 className="text-4xl font-bold text-ink">Ready to book your dream stay?</h2>
           <p className="mt-4 text-lg text-slate-500">Join thousands of guests who trust StayEase for seamless hotel bookings.</p>
           <div className="mt-8 flex flex-wrap justify-center gap-4">
-            <Link to="/register" className="btn-primary text-base px-8 py-3">Start booking</Link>
+            {!isAuthenticated && (
+              <Link to="/register" className="btn-primary text-base px-8 py-3">Start booking</Link>
+            )}
             <Link to="/hotels" className="btn-secondary text-base px-8 py-3">Browse hotels</Link>
           </div>
         </div>

@@ -30,7 +30,7 @@ const checkoutSchema = z.object({
 });
 
 export default function Checkout() {
-  const { session } = useAuth();
+  const { session, isAdmin } = useAuth();
   const navigate = useNavigate();
   const { state } = useLocation();
   const room = state?.room;
@@ -40,7 +40,7 @@ export default function Checkout() {
   const [offerError, setOfferError] = useState('');
   const [validatingOffer, setValidatingOffer] = useState(false);
 
-  if (!room) {
+  if (!room || isAdmin) {
     navigate('/hotels', { replace: true });
     return null;
   }

@@ -37,12 +37,12 @@ export function Modal({ open, onClose, title, children, size = 'md' }) {
   );
 }
 
-export function ConfirmModal({ open, onClose, onConfirm, title, message, confirmLabel = 'Confirm', danger = false, loading }) {
+export function ConfirmModal({ open, onClose, onConfirm, title, message, confirmLabel = 'Confirm', cancelLabel = 'Cancel', danger = false, loading }) {
   return (
     <Modal open={open} onClose={onClose} title={title} size="sm">
       <p className="text-sm text-slate-600">{message}</p>
       <div className="mt-6 flex justify-end gap-3">
-        <Button variant="ghost" onClick={onClose} disabled={loading}>Cancel</Button>
+        <Button variant="ghost" onClick={onClose} disabled={loading}>{cancelLabel}</Button>
         <Button variant={danger ? 'danger' : 'primary'} onClick={onConfirm} loading={loading}>
           {confirmLabel}
         </Button>

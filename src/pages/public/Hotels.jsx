@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { SlidersHorizontal, Search } from 'lucide-react';
 import { roomsAPI } from '../../services/api';
 import { RoomCard, EmptyRooms } from '../../components/RoomCard';
@@ -16,6 +16,7 @@ const PER_PAGE = 9;
 
 export default function Hotels() {
   const [params] = useSearchParams();
+  const navigate = useNavigate();
   const { session, isAuthenticated } = useAuth();
 
   const [rooms, setRooms] = useState([]);
@@ -140,6 +141,15 @@ export default function Hotels() {
                       room={room}
                       isFavorite={favoriteIds.has(String(room._id))}
                       onFavorite={toggleFavorite}
+                      onSelect={(r) => {
+                        if (!isAuthenticated) {
+                          navigate('/login', { state: { from: { pathname: '/hotels' } } });
+                          return;
+                        }
+                        navigate('/checkout', {
+                          state: { room: r, checkIn: filters.checkIn, checkOut: filters.checkOut },
+                        });
+                      }}
                     />
                   ))
                 : <div className="col-span-full"><EmptyRooms /></div>}

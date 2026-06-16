@@ -68,7 +68,7 @@ export function BookingTable({ bookings, onCancel, showUser = false }) {
                       <Eye size={14} />
                     </Button>
                   </Link>
-                  {booking.status !== 'cancelled' && onCancel && (
+                  {booking.status !== 'cancelled' && booking.status !== 'completed' && new Date(booking.checkIn) > new Date() && onCancel && (
                     <Button variant="ghost" size="sm" onClick={() => onCancel(booking)} className="text-coral hover:bg-coral/10">
                       <XCircle size={14} />
                     </Button>

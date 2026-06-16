@@ -44,6 +44,10 @@ function rzpErrorMessage(e) {
 
 router.post('/create-order', requireAuth, async (req, res) => {
   try {
+    if (req.user.role === 'admin') {
+      return res.status(403).json({ success: false, message: 'Administrators cannot create reservations' });
+    }
+
     const {
       roomId,
       checkIn,
@@ -136,6 +140,10 @@ router.post('/create-order', requireAuth, async (req, res) => {
 
 router.post('/verify', requireAuth, async (req, res) => {
   try {
+    if (req.user.role === 'admin') {
+      return res.status(403).json({ success: false, message: 'Administrators cannot create reservations' });
+    }
+
     const {
       razorpay_order_id,
       razorpay_payment_id,

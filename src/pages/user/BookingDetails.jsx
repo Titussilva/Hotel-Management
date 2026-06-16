@@ -1,19 +1,24 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { bookingsAPI } from '../../services/api';
+import { useAuth } from '../../contexts/AuthContext';
 import { Breadcrumbs } from '../../components/Breadcrumbs';
 import { StatusBadge } from '../../components/ui/Badge';
 import { Spinner } from '../../components/ui/Spinner';
 import { Button } from '../../components/ui/Button';
+import { ConfirmModal } from '../../components/ui/Modal';
 import { money } from '../../utils/money';
 import { formatDate } from '../../utils/dates';
-import { Printer, BedDouble, Calendar, Users, CreditCard } from 'lucide-react';
+import { Printer, BedDouble, Calendar, Users, CreditCard, Hash, Building2, Tag, XCircle, CheckCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export default function BookingDetails() {
   const { id } = useParams();
+  const { session, isAdmin } = useAuth();
   const [booking, setBooking] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [cancelling, setCancelling] = useState(false);
 
   useEffect(() => {
     bookingsAPI.get(id)
@@ -22,17 +27,26 @@ export default function BookingDetails() {
       .finally(() => setLoading(false));
   }, [id]);
 
+  /* ── Cancel logic (reuses existing API) ── */
+  const canCancel =
+    booking &&
+    booking.status !== 'cancelled' &&
+    booking.status !== 'completed' &&
+    new Date(booking.checkIn) > new Date() &&
+    !isAdmin;
+
   async function handleCancel() {
-    if (!window.confirm('Cancel Booking?')) return;
+    setCancelling(true);
     try {
-      setLoading(true);
       await bookingsAPI.cancel(id);
       const res = await bookingsAPI.get(id);
       setBooking(res.data || res);
+      toast.success('Booking cancelled successfully');
     } catch (e) {
-      toast.error('Cancellation failed');
+      toast.error(e.message || 'Cancellation failed');
     } finally {
-      setLoading(false);
+      setCancelling(false);
+      setShowCancelModal(false);
     }
   }
 
@@ -71,12 +85,15 @@ export default function BookingDetails() {
     w.print();
   }
 
+  const bookingId = String(booking._id).slice(-8).toUpperCase();
+
   return (
     <div className="p-6 lg:p-8">
-      <Breadcrumbs items={[{ href: '/dashboard', label: 'Dashboard' }, { href: '/dashboard/bookings', label: 'My Bookings' }, { label: `#${String(booking._id).slice(-8).toUpperCase()}` }]} />
+      <Breadcrumbs items={[{ href: '/dashboard', label: 'Dashboard' }, { href: '/dashboard/bookings', label: 'My Bookings' }, { label: `#${bookingId}` }]} />
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_320px]">
-                <div className="card p-6">
+        {/* ── Left column: booking info ── */}
+        <div className="card p-6">
           <div className="flex items-start justify-between mb-5">
             <div>
               <h1 className="text-2xl font-bold text-ink">{booking.room?.name || 'Room'}</h1>
@@ -87,17 +104,32 @@ export default function BookingDetails() {
 
           <div className="grid gap-4 sm:grid-cols-2">
             {[
-              { icon: <Calendar size={18} />, label: 'Check-in',  value: formatDate(booking.checkIn)  },
-              { icon: <Calendar size={18} />, label: 'Check-out', value: formatDate(booking.checkOut) },
-              { icon: <Users size={18} />,    label: 'Guests',    value: booking.guests               },
-              { icon: <CreditCard size={18} />,label: 'Payment',  value: booking.paymentMethod        },
+              { icon: <Hash size={18} />,       label: 'Booking ID',      value: `#${bookingId}` },
+              { icon: <BedDouble size={18} />,   label: 'Room',            value: booking.room?.name || '—' },
+              { icon: <Building2 size={18} />,   label: 'Hotel',           value: booking.room?.hotel || booking.hotel || 'StayEase' },
+              { icon: <Calendar size={18} />,    label: 'Check-in',        value: formatDate(booking.checkIn) },
+              { icon: <Calendar size={18} />,    label: 'Check-out',       value: formatDate(booking.checkOut) },
+              { icon: <Users size={18} />,       label: 'Guests',          value: booking.guests },
+              { icon: <CreditCard size={18} />,  label: 'Payment Status',  value: booking.paymentStatus || booking.paymentMethod || '—' },
+              { icon: <CheckCircle size={18} />, label: 'Booking Status',  value: booking.status },
             ].map((d) => (
               <div key={d.label} className="rounded-xl bg-slate-50 p-4">
                 <div className="flex items-center gap-2 text-pine mb-1">{d.icon}<span className="text-xs text-slate-400">{d.label}</span></div>
-                <div className="font-semibold text-ink">{d.value}</div>
+                <div className="font-semibold text-ink capitalize">{d.value}</div>
               </div>
             ))}
           </div>
+
+          {/* Coupon / discount code */}
+          {(booking.coupon || booking.couponCode || booking.offerCode) && (
+            <div className="mt-4 rounded-xl bg-emerald-50 p-4">
+              <div className="flex items-center gap-2 text-emerald-700 mb-1">
+                <Tag size={18} />
+                <span className="text-xs font-semibold uppercase tracking-wide text-emerald-500">Coupon applied</span>
+              </div>
+              <p className="font-mono font-semibold text-emerald-700">{booking.coupon || booking.couponCode || booking.offerCode}</p>
+            </div>
+          )}
 
           {booking.specialRequests && (
             <div className="mt-4 rounded-xl bg-mist p-4">
@@ -114,7 +146,8 @@ export default function BookingDetails() {
           )}
         </div>
 
-                <div className="card p-6">
+        {/* ── Right column: payment summary + actions ── */}
+        <div className="card p-6">
           <h3 className="font-semibold text-ink mb-4">Payment summary</h3>
           <div className="space-y-3 text-sm">
             <div className="flex justify-between">
@@ -144,15 +177,41 @@ export default function BookingDetails() {
             ← Back to bookings
           </Link>
 
-          {booking.status !== 'cancelled' && new Date(booking.checkIn) > new Date() && (
-            <div className="mt-6 border-t border-slate-100 pt-5">
-              <Button variant="danger" className="w-full justify-center bg-coral/10 text-coral hover:bg-coral hover:text-white" onClick={handleCancel}>
-                Cancel Reservation
+          {/* ── Cancel reservation action ── */}
+          <div className="mt-6 border-t border-slate-100 pt-5">
+            {booking.status === 'cancelled' ? (
+              <Button
+                variant="danger"
+                className="w-full justify-center gap-2 bg-coral/10 text-coral cursor-not-allowed"
+                disabled
+              >
+                <XCircle size={16} /> Reservation Cancelled
               </Button>
-            </div>
-          )}
+            ) : canCancel ? (
+              <Button
+                variant="danger"
+                className="w-full justify-center gap-2 bg-coral/10 text-coral hover:bg-coral hover:text-white"
+                onClick={() => setShowCancelModal(true)}
+              >
+                <XCircle size={16} /> Cancel Reservation
+              </Button>
+            ) : null}
+          </div>
         </div>
       </div>
+
+      {/* ── Cancel confirmation modal ── */}
+      <ConfirmModal
+        open={showCancelModal}
+        onClose={() => setShowCancelModal(false)}
+        onConfirm={handleCancel}
+        loading={cancelling}
+        title="Cancel this reservation?"
+        message={`Are you sure you want to cancel your booking for ${booking.room?.name || 'this room'}? This action cannot be undone.`}
+        confirmLabel="Confirm Cancellation"
+        cancelLabel="Keep Booking"
+        danger
+      />
     </div>
   );
 }
