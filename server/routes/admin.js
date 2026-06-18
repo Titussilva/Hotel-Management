@@ -105,6 +105,9 @@ router.get('/bookings', async (req, res) => {
 
 router.patch('/bookings/:id', async (req, res) => {
   try {
+    if (req.body.status === 'cancelled') {
+      return res.status(403).json({ success: false, message: 'Administrators cannot cancel reservations' });
+    }
     const booking = await Booking.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
     if (!booking) return res.status(404).json({ success: false, message: 'Booking not found' });
     res.json({ success: true, message: 'Booking updated', data: booking });

@@ -1,5 +1,6 @@
 import express from 'express';
 import mongoose from 'mongoose';
+import Razorpay from 'razorpay';
 import { body, validationResult } from 'express-validator';
 import Booking from '../models/Booking.js';
 import Offer from '../models/Offer.js';
@@ -201,14 +202,40 @@ router.post(
 
 router.patch('/:id/cancel', requireAuth, async (req, res) => {
   try {
+    if (req.user.role === 'admin') {
+      return res.status(403).json({ success: false, message: 'Administrators cannot cancel reservations' });
+    }
+
     const booking = await Booking.findOne({ _id: req.params.id, user: req.user._id });
     if (!booking) return res.status(404).json({ success: false, message: 'Booking not found' });
     if (booking.status === 'cancelled') {
       return res.status(400).json({ success: false, message: 'Booking is already cancelled' });
     }
 
+    if (booking.paymentStatus === 'paid' && booking.razorpayPaymentId) {
+      try {
+        const key_id = (process.env.RAZORPAY_KEY_ID || '').trim();
+        const key_secret = (process.env.RAZORPAY_KEY_SECRET || '').trim();
+        if (key_id && key_secret) {
+          const rzp = new Razorpay({ key_id, key_secret });
+          const refund = await rzp.payments.refund(booking.razorpayPaymentId, {
+            amount: Math.round((booking.total || 0) * 100)
+          });
+          booking.refundId = refund.id;
+          booking.paymentStatus = 'refunded';
+        } else {
+          console.warn('[bookings] Razorpay keys missing, skipping actual refund API call');
+          booking.paymentStatus = 'refunded';
+        }
+      } catch (refundError) {
+        console.error('[bookings] Refund failed:', refundError);
+        return res.status(500).json({ success: false, message: 'Refund failed', detail: refundError.message || 'Razorpay refund error' });
+      }
+    } else if (booking.paymentStatus === 'paid') {
+      booking.paymentStatus = 'refunded';
+    }
+
     booking.status = 'cancelled';
-    if (booking.paymentStatus === 'paid') booking.paymentStatus = 'refunded';
     await booking.save();
 
     await Notification.create({

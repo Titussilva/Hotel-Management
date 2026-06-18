@@ -167,6 +167,11 @@ export default function BookingDetails() {
           <div className="mt-4">
             <p className="text-xs text-slate-400 mb-1">Payment status</p>
             <StatusBadge status={booking.paymentStatus} />
+            {booking.refundId && (
+              <p className="mt-2 text-xs text-slate-500 font-mono">
+                Refund ID: {booking.refundId}
+              </p>
+            )}
           </div>
 
           <Button variant="secondary" className="mt-5 w-full justify-center gap-2" onClick={printInvoice}>

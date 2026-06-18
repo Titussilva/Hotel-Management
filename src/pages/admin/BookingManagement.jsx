@@ -42,22 +42,6 @@ export default function BookingManagement() {
   }
 
   useEffect(() => { load(); }, [tab, search, page]);
-
-  async function handleCancel() {
-    if (!actionTarget) return;
-    setActing(true);
-    try {
-      await adminAPI.updateBooking(actionTarget._id, { status: 'cancelled' });
-      toast.success('Booking cancelled');
-      load();
-    } catch (e) {
-      toast.error(e.message);
-    } finally {
-      setActing(false);
-      setActionTarget(null);
-    }
-  }
-
   return (
     <div className="p-6 lg:p-8">
       <div className="mb-6">
@@ -85,7 +69,7 @@ export default function BookingManagement() {
         <div className="card p-5"><TableSkeleton rows={10} /></div>
       ) : (
         <>
-          <BookingTable bookings={bookings} onCancel={setActionTarget} showUser />
+          <BookingTable bookings={bookings} showUser />
           {total > PER_PAGE && (
             <div className="mt-6">
               <Pagination page={page} totalPages={Math.ceil(total / PER_PAGE)} onPageChange={setPage} />
@@ -93,10 +77,6 @@ export default function BookingManagement() {
           )}
         </>
       )}
-
-      <ConfirmModal open={!!actionTarget} onClose={() => setActionTarget(null)} onConfirm={handleCancel}
-        loading={acting} title="Cancel booking" danger confirmLabel="Cancel booking"
-        message={`Cancel booking for ${actionTarget?.room?.name || 'this room'}?`} />
     </div>
   );
 }

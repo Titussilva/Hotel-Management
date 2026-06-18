@@ -59,7 +59,14 @@ export function BookingTable({ bookings, onCancel, showUser = false }) {
               <td className="table-td">{formatDate(booking.checkOut)}</td>
               <td className="table-td">{booking.guests}</td>
               <td className="table-td font-semibold">{money(booking.total)}</td>
-              <td className="table-td"><StatusBadge status={booking.paymentStatus} /></td>
+              <td className="table-td">
+                <StatusBadge status={booking.paymentStatus} />
+                {booking.refundId && (
+                  <div className="mt-1 text-[10px] text-slate-400 font-mono">
+                    ID: {booking.refundId}
+                  </div>
+                )}
+              </td>
               <td className="table-td"><StatusBadge status={booking.status} /></td>
               <td className="table-td">
                 <div className="flex items-center gap-1.5">
