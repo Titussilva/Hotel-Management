@@ -12,6 +12,10 @@ const userSchema = new mongoose.Schema(
       amenities: [String],
       budget: Number,
     },
+    notifications: {
+      email: { type: Boolean, default: true },
+      sms: { type: Boolean, default: false },
+    },
     favorites: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Room' }],
   },
   { timestamps: true },

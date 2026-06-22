@@ -7,8 +7,14 @@ import { bookedUnitsForRoom } from '../utils/booking.js';
 const router = express.Router();
 
 router.get('/', async (req, res) => {
-  const { type, minPrice, maxPrice, amenities, checkIn, checkOut, guests } = req.query;
+  const { search, type, minPrice, maxPrice, amenities, checkIn, checkOut, guests } = req.query;
 const query = { isActive: { $ne: false } };
+  if (search) {
+    query.$or = [
+      { name: new RegExp(search, 'i') },
+      { type: new RegExp(search, 'i') },
+    ];
+  }
   if (type) query.type = type;
   if (guests) query.maxGuests = { $gte: Number(guests) };
   if (minPrice || maxPrice) {

@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useAuth } from '../../contexts/AuthContext';
-import { paymentsAPI, offersAPI } from '../../services/api';
+import { paymentsAPI, offersAPI, roomsAPI } from '../../services/api';
 import { Button } from '../../components/ui/Button';
 import { Breadcrumbs } from '../../components/Breadcrumbs';
 import { money } from '../../utils/money';
@@ -33,17 +33,30 @@ export default function Checkout() {
   const { session, isAdmin } = useAuth();
   const navigate = useNavigate();
   const { state } = useLocation();
-  const room = state?.room;
+  const { roomId } = useParams();
+  const [room, setRoom] = useState(state?.room || null);
+  const [loadingRoom, setLoadingRoom] = useState(!state?.room);
   const [paying, setPaying] = useState(false);
   const [offerDiscount, setOfferDiscount] = useState(0);
   const [offerData, setOfferData] = useState(null);
   const [offerError, setOfferError] = useState('');
   const [validatingOffer, setValidatingOffer] = useState(false);
 
-  if (!room || isAdmin) {
-    navigate('/hotels', { replace: true });
-    return null;
-  }
+  React.useEffect(() => {
+    if (isAdmin) {
+      navigate('/hotels', { replace: true });
+      return;
+    }
+    if (!room && roomId) {
+      roomsAPI.get(roomId).then(data => {
+        setRoom(data.room);
+      }).catch(() => {
+        navigate('/hotels', { replace: true });
+      }).finally(() => {
+        setLoadingRoom(false);
+      });
+    }
+  }, [roomId, room, isAdmin, navigate]);
 
   const { register, handleSubmit, watch, formState: { errors } } = useForm({
     resolver: zodResolver(checkoutSchema),
@@ -62,7 +75,7 @@ export default function Checkout() {
   const watchedCheckIn  = watch('checkIn');
   const watchedCheckOut = watch('checkOut');
   const nights = nightsBetween(watchedCheckIn, watchedCheckOut);
-  const subtotal = room.price * nights;
+  const subtotal = (room?.price || 0) * nights;
   const total = Math.max(0, subtotal - offerDiscount);
 
   React.useEffect(() => {
@@ -135,7 +148,7 @@ export default function Checkout() {
     setPaying(true);
     try {
       const payload = {
-        roomId: room._id,
+        roomId: room?._id,
         checkIn: values.checkIn,
         checkOut: values.checkOut,
         guests: values.guests,
@@ -165,6 +178,9 @@ export default function Checkout() {
       setPaying(false);
     }
   }
+
+  if (loadingRoom) return <div className="p-8 text-center text-slate-500">Loading checkout...</div>;
+  if (!room) return null;
 
   return (
     <div className="p-6 lg:p-8">
@@ -215,7 +231,7 @@ export default function Checkout() {
               </div>
               <div>
                 <label className="label">Guests *</label>
-                <input type="number" className={`input-field ${errors.guests ? 'input-error' : ''}`} min="1" max={room.maxGuests} {...register('guests')} />
+                <input type="number" className={`input-field ${errors.guests ? 'input-error' : ''}`} min="1" max={room?.maxGuests || 1} {...register('guests')} />
                 {errors.guests && <p className="mt-1 text-xs text-red-500">{errors.guests.message}</p>}
               </div>
             </div>

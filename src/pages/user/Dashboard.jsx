@@ -58,35 +58,19 @@ export default function Dashboard() {
         <StatCard icon={<Bell size={22} />} label="Notifications" value={unread} sub="unread" color="coral" loading={loading} />
       </div>
 
-      <div className="mt-8 grid gap-4 sm:grid-cols-3">
-        <Link to="/hotels" className="flex items-center gap-4 rounded-xl bg-pine text-white p-5 transition-transform hover:scale-[1.01]">
-          <div className="grid h-12 w-12 place-items-center rounded-xl bg-white/20"><BedDouble size={24} /></div>
+      <div className="mt-8 grid gap-4 sm:grid-cols-2">
+        <Link to="/hotels" className="flex items-center gap-5 rounded-2xl bg-pine text-white p-6 shadow-lg transition-transform hover:-translate-y-1">
+          <div className="grid h-14 w-14 place-items-center rounded-xl bg-white/20"><BedDouble size={28} /></div>
           <div>
-            <div className="font-semibold">Browse Hotels</div>
-            <div className="text-sm text-white/70">Book Now</div>
+            <div className="text-xl font-bold">Book Now</div>
+            <div className="text-white/80">Browse and reserve your next stay</div>
           </div>
         </Link>
-        {!isAdmin && (
-          <Link to="/hotels" className="flex items-center gap-4 rounded-xl bg-emerald-600 text-white p-5 transition-transform hover:scale-[1.01]">
-            <div className="grid h-12 w-12 place-items-center rounded-xl bg-white/20"><BedDouble size={24} /></div>
-            <div>
-              <div className="font-semibold">Book Now</div>
-              <div className="text-sm text-white/70">Start reservation</div>
-            </div>
-          </Link>
-        ) }
-        <Link to="/search" className="flex items-center gap-4 rounded-xl bg-white p-5 shadow-soft transition-transform hover:scale-[1.01]">
-          <div className="grid h-12 w-12 place-items-center rounded-xl bg-mist text-pine"><BedDouble size={24} /></div>
+        <Link to="/favorites" className="flex items-center gap-5 rounded-2xl bg-white p-6 shadow-soft transition-transform hover:-translate-y-1">
+          <div className="grid h-14 w-14 place-items-center rounded-xl bg-coral/10 text-coral"><Heart size={28} /></div>
           <div>
-            <div className="font-semibold text-ink">Search Hotels</div>
-            <div className="text-sm text-slate-500">Find your perfect stay</div>
-          </div>
-        </Link>
-        <Link to="/favorites" className="flex items-center gap-4 rounded-xl bg-white p-5 shadow-soft transition-transform hover:scale-[1.01]">
-          <div className="grid h-12 w-12 place-items-center rounded-xl bg-coral/10 text-coral"><Heart size={24} /></div>
-          <div>
-            <div className="font-semibold text-ink">Favorites</div>
-            <div className="text-sm text-slate-500">Saved rooms</div>
+            <div className="text-xl font-bold text-ink">Favorites</div>
+            <div className="text-slate-500">View your saved rooms</div>
           </div>
         </Link>
       </div>

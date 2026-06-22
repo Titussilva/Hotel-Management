@@ -62,7 +62,7 @@ export default function App() {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/dashboard/bookings" element={<MyBookings />} />
             <Route path="/bookings/:id" element={<BookingDetails />} />
-            <Route path="/checkout" element={<Checkout />} />
+            <Route path="/checkout/:roomId" element={<Checkout />} />
             <Route path="/favorites" element={<Favorites />} />
             <Route path="/notifications" element={<Notifications />} />
             <Route path="/profile" element={<Profile />} />

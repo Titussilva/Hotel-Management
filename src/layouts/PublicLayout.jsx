@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom';
-import { Hotel, Menu, X, ChevronDown } from 'lucide-react';
+import { Hotel, Menu, X, ChevronDown, Search } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
 const navLinks = [
   { to: '/', label: 'Home' },
   { to: '/hotels', label: 'Hotels' },
-  { to: '/search', label: 'Search' },
   { to: '/offers', label: 'Offers' },
 ];
 
@@ -39,6 +38,10 @@ export function PublicLayout() {
                 {l.label}
               </NavLink>
             ))}
+            <form onSubmit={(e) => { e.preventDefault(); const q = e.target.elements.search.value; if(q) navigate(`/hotels?search=${encodeURIComponent(q)}`); }} className="relative flex items-center">
+              <input type="search" name="search" placeholder="Search hotels..." className="rounded-full border border-slate-200 bg-slate-50 px-4 py-1.5 pl-9 text-sm outline-none focus:border-pine focus:ring-1 focus:ring-pine" />
+              <Search size={16} className="absolute left-3 text-slate-400" />
+            </form>
           </nav>
 
           <div className="flex items-center gap-3">
@@ -47,7 +50,7 @@ export function PublicLayout() {
             ) : isAuthenticated ? (
               <div className="hidden md:flex items-center gap-4">
                 {!isAdmin && (
-                  <Link to="/dashboard" className="text-sm font-medium text-slate-600 hover:text-pine transition-colors">
+                  <Link to="/dashboard/bookings" className="text-sm font-medium text-slate-600 hover:text-pine transition-colors">
                     My Bookings
                   </Link>
                 )}
@@ -91,6 +94,10 @@ export function PublicLayout() {
                 {l.label}
               </Link>
             ))}
+            <form onSubmit={(e) => { e.preventDefault(); const q = e.target.elements.search.value; if(q) { setMenuOpen(false); navigate(`/hotels?search=${encodeURIComponent(q)}`); } }} className="relative flex items-center mt-2 mb-2">
+              <input type="search" name="search" placeholder="Search hotels..." className="w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-2 pl-10 text-sm outline-none focus:border-pine focus:ring-1 focus:ring-pine" />
+              <Search size={18} className="absolute left-3 text-slate-400" />
+            </form>
             <div className="mt-3 flex flex-col gap-2 border-t border-slate-100 pt-3">
               {isAuthenticated ? (
                 <>

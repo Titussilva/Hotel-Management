@@ -11,9 +11,12 @@ import toast from 'react-hot-toast';
 
 const profileSchema = z.object({
   name:    z.string().min(2, 'Name must be at least 2 characters'),
+  email:   z.string().email('Invalid email format').optional(),
   phone:   z.string().regex(/^\+?[\d\s\-().]{7,20}$/, 'Invalid phone number').optional().or(z.literal('')),
   bedType: z.string().optional(),
   budget:  z.coerce.number().min(0).optional(),
+  notifyEmail: z.boolean().optional(),
+  notifySms: z.boolean().optional(),
 });
 
 export default function Profile() {
@@ -29,19 +32,24 @@ export default function Profile() {
       const u = res.user;
       reset({
         name:    u.name || '',
+        email:   u.email || '',
         phone:   u.phone || '',
         bedType: u.preferences?.bedType || '',
         budget:  u.preferences?.budget || '',
+        notifyEmail: u.notifications?.email ?? true,
+        notifySms:   u.notifications?.sms ?? false,
       });
     }).catch(() => {}).finally(() => setPageLoading(false));
   }, []);
 
-  async function onSubmit({ name, phone, bedType, budget }) {
+  async function onSubmit({ name, email, phone, bedType, budget, notifyEmail, notifySms }) {
     try {
       const res = await authAPI.updateProfile({
         name,
+        email: email || undefined,
         phone: phone || undefined,
         preferences: { bedType: bedType || undefined, budget: budget ? Number(budget) : undefined },
+        notifications: { email: notifyEmail, sms: notifySms },
       });
       updateSession({ user: { ...session.user, name: res.user?.name || name } });
       toast.success('Profile updated successfully');
@@ -71,8 +79,8 @@ export default function Profile() {
 
             <div>
               <label className="label">Email</label>
-              <input className="input-field bg-slate-50 cursor-not-allowed" value={session?.user?.email || ''} disabled />
-              <p className="mt-1 text-xs text-slate-400">Email cannot be changed.</p>
+              <input className={`input-field ${errors.email ? 'input-error' : ''}`} {...register('email')} />
+              {errors.email && <p className="mt-1 text-xs text-red-500">{errors.email.message}</p>}
             </div>
 
             <div>
@@ -97,6 +105,20 @@ export default function Profile() {
                   <label className="label">Budget per night (₹)</label>
                   <input type="number" className="input-field" min={0} {...register('budget')} />
                 </div>
+              </div>
+            </div>
+
+            <div className="border-t border-slate-100 pt-5">
+              <h3 className="font-semibold text-ink mb-4">Notifications</h3>
+              <div className="space-y-3">
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <input type="checkbox" className="h-4 w-4 rounded border-slate-300 text-pine focus:ring-pine" {...register('notifyEmail')} />
+                  <span className="text-sm text-slate-700">Receive email updates about bookings and offers</span>
+                </label>
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <input type="checkbox" className="h-4 w-4 rounded border-slate-300 text-pine focus:ring-pine" {...register('notifySms')} />
+                  <span className="text-sm text-slate-700">Receive SMS notifications (requires phone number)</span>
+                </label>
               </div>
             </div>
 

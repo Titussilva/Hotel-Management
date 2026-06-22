@@ -127,7 +127,7 @@ router.put(
     if (validationError) return;
 
     try {
-      const allowed = ['name', 'phone', 'preferences', 'favorites'];
+      const allowed = ['name', 'email', 'phone', 'preferences', 'notifications', 'favorites'];
       for (const key of allowed) {
         if (req.body[key] !== undefined) req.user[key] = req.body[key];
       }

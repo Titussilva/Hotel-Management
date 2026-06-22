@@ -59,7 +59,7 @@ export default function RoomDetails() {
 
   function handleBook() {
     if (!isAuthenticated) { navigate('/login', { state: { from: { pathname: `/rooms/${id}` } } }); return; }
-    navigate('/checkout', { state: { room: data.room, checkIn, checkOut } });
+    navigate(`/checkout/${data.room._id}`, { state: { room: data.room, checkIn, checkOut } });
   }
 
   if (loading) return (
@@ -222,7 +222,7 @@ export default function RoomDetails() {
                 </div>
                 <Button className="mt-4 w-full justify-center py-3 text-base" onClick={handleBook}
                   disabled={(room.availableUnits ?? room.totalUnits) <= 0}>
-                  {(room.availableUnits ?? room.totalUnits) <= 0 ? 'Sold out' : 'Reserve room'}
+                  {(room.availableUnits ?? room.totalUnits) <= 0 ? 'Sold out' : 'Book Now'}
                 </Button>
                 <p className="mt-3 text-center text-xs text-slate-400">No charge until confirmed</p>
               </div>

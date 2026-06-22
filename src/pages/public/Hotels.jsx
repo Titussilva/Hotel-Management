@@ -24,6 +24,7 @@ export default function Hotels() {
   const [page, setPage] = useState(1);
   const [favoriteIds, setFavoriteIds] = useState(new Set());
   const [filters, setFilters] = useState({
+    search:   params.get('search')   || '',
     checkIn:  params.get('checkIn')  || today(),
     checkOut: params.get('checkOut') || addDays(today(), 3),
     type:     params.get('type')     || '',
@@ -36,6 +37,7 @@ export default function Hotels() {
   useEffect(() => {
     setLoading(true);
     const q = { sort: filters.sort };
+    if (filters.search) q.search = filters.search;
     if (filters.type) q.type = filters.type;
     if (filters.guests) q.guests = filters.guests;
     if (filters.checkIn) q.checkIn = filters.checkIn;
@@ -129,6 +131,7 @@ export default function Hotels() {
             <div className="mb-4 flex items-center justify-between">
               <p className="text-sm text-slate-500">
                 {loading ? 'Searching…' : `${rooms.length} room${rooms.length !== 1 ? 's' : ''} found`}
+                {!loading && filters.search && ` matching "${filters.search}"`}
               </p>
             </div>
             <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
@@ -146,7 +149,7 @@ export default function Hotels() {
                           navigate('/login', { state: { from: { pathname: '/hotels' } } });
                           return;
                         }
-                        navigate('/checkout', {
+                        navigate(`/checkout/${r._id}`, {
                           state: { room: r, checkIn: filters.checkIn, checkOut: filters.checkOut },
                         });
                       }}
