@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -22,6 +22,7 @@ const registerSchema = z.object({
 export default function Register() {
   const { register: authRegister } = useAuth();
   const navigate = useNavigate();
+  const { state } = useLocation();
   const [showPw, setShowPw] = useState(false);
 
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm({
@@ -33,7 +34,8 @@ export default function Register() {
     try {
       const sess = await authRegister({ name, email, password, phone: phone || undefined });
       toast.success(`Welcome to StayEase, ${sess.user.name}!`);
-      navigate('/dashboard', { replace: true });
+      const redirectPath = state?.from?.pathname || '/hotels';
+      navigate(redirectPath, { replace: true });
     } catch (e) {
       toast.error(e.message || 'Registration failed');
     }
@@ -117,7 +119,7 @@ export default function Register() {
 
             <p className="mt-5 text-center text-sm text-slate-500">
               Already have an account?{' '}
-              <Link to="/login" className="font-semibold text-pine hover:underline">Log in</Link>
+              <Link to="/login" state={state} className="font-semibold text-pine hover:underline">Log in</Link>
             </p>
           </div>
         </div>

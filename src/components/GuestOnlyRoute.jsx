@@ -12,7 +12,7 @@ export function GuestOnlyRoute({ children }) {
   if (loading) return null;
 
   if (isAuthenticated) {
-    return <Navigate to={isAdmin ? '/admin' : '/dashboard'} replace />;
+    return <Navigate to={isAdmin ? '/admin' : '/hotels'} replace />;
   }
   return children;
 }

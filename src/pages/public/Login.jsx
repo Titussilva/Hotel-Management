@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -17,11 +17,15 @@ const loginSchema = z.object({
 export default function Login() {
   const { login, isAuthenticated, isAdmin } = useAuth();
   const navigate = useNavigate();
+  const { state } = useLocation();
   const [showPw, setShowPw] = useState(false);
 
   useEffect(() => {
-    if (isAuthenticated) navigate(isAdmin ? '/admin' : '/dashboard', { replace: true });
-  }, [isAuthenticated]);
+    if (isAuthenticated) {
+      const from = state?.from?.pathname || (isAdmin ? '/admin' : '/hotels');
+      navigate(from, { replace: true });
+    }
+  }, [isAuthenticated, isAdmin, navigate, state]);
 
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm({
     resolver: zodResolver(loginSchema),
@@ -32,7 +36,8 @@ export default function Login() {
     try {
       const sess = await login(email, password);
       toast.success(`Welcome back, ${sess.user.name}!`);
-      navigate(sess.user.role === 'admin' ? '/admin' : '/dashboard', { replace: true });
+      const redirectPath = state?.from?.pathname || (sess.user.role === 'admin' ? '/admin' : '/hotels');
+      navigate(redirectPath, { replace: true });
     } catch (e) {
       toast.error(e.message || 'Login failed. Check your credentials.');
     }
@@ -124,7 +129,7 @@ export default function Login() {
 
             <p className="mt-5 text-center text-sm text-slate-500">
               Don't have an account?{' '}
-              <Link to="/register" className="font-semibold text-pine hover:underline">Create one</Link>
+              <Link to="/register" state={state} className="font-semibold text-pine hover:underline">Create one</Link>
             </p>
           </div>
         </div>
