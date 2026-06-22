@@ -97,14 +97,18 @@ export function RoomCard({ room, onFavorite, isFavorite, onSelect, selected }) {
   );
 }
 
-export function EmptyRooms() {
+export function EmptyRooms({ searchQuery }) {
   return (
     <div className="col-span-3 flex flex-col items-center justify-center rounded-xl bg-white py-20 shadow-soft">
       <div className="grid h-20 w-20 place-items-center rounded-full bg-mist">
         <BedDouble size={36} className="text-pine/60" />
       </div>
-      <h3 className="mt-5 text-lg font-semibold text-ink">No rooms match your search</h3>
-      <p className="mt-2 text-sm text-slate-500">Try adjusting filters or expanding the price range.</p>
+      <h3 className="mt-5 text-lg font-semibold text-ink">
+        {searchQuery ? `No hotels found for '${searchQuery}'` : 'No rooms match your search'}
+      </h3>
+      <p className="mt-2 text-sm text-slate-500">
+        {searchQuery ? 'Try adjusting your search or filters.' : 'Try adjusting filters or expanding the price range.'}
+      </p>
     </div>
   );
 }

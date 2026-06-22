@@ -38,7 +38,7 @@ export function PublicLayout() {
                 {l.label}
               </NavLink>
             ))}
-            <form onSubmit={(e) => { e.preventDefault(); const q = e.target.elements.search.value; if(q) navigate(`/hotels?search=${encodeURIComponent(q)}`); }} className="relative flex items-center">
+            <form onSubmit={(e) => { e.preventDefault(); const q = e.target.elements.search.value; if(q) navigate(`/hotels?search=${encodeURIComponent(q)}`); else navigate('/hotels'); }} className="relative flex items-center">
               <input type="search" name="search" placeholder="Search hotels..." className="rounded-full border border-slate-200 bg-slate-50 px-4 py-1.5 pl-9 text-sm outline-none focus:border-pine focus:ring-1 focus:ring-pine" />
               <Search size={16} className="absolute left-3 text-slate-400" />
             </form>
@@ -94,7 +94,7 @@ export function PublicLayout() {
                 {l.label}
               </Link>
             ))}
-            <form onSubmit={(e) => { e.preventDefault(); const q = e.target.elements.search.value; if(q) { setMenuOpen(false); navigate(`/hotels?search=${encodeURIComponent(q)}`); } }} className="relative flex items-center mt-2 mb-2">
+            <form onSubmit={(e) => { e.preventDefault(); const q = e.target.elements.search.value; setMenuOpen(false); if(q) navigate(`/hotels?search=${encodeURIComponent(q)}`); else navigate('/hotels'); }} className="relative flex items-center mt-2 mb-2">
               <input type="search" name="search" placeholder="Search hotels..." className="w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-2 pl-10 text-sm outline-none focus:border-pine focus:ring-1 focus:ring-pine" />
               <Search size={18} className="absolute left-3 text-slate-400" />
             </form>

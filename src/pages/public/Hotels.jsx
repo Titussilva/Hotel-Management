@@ -35,6 +35,11 @@ export default function Hotels() {
   });
 
   useEffect(() => {
+    const searchParam = params.get('search') || '';
+    setFilters(prev => ({ ...prev, search: searchParam }));
+  }, [params]);
+
+  useEffect(() => {
     setLoading(true);
     const q = { sort: filters.sort };
     if (filters.search) q.search = filters.search;
@@ -155,7 +160,7 @@ export default function Hotels() {
                       }}
                     />
                   ))
-                : <div className="col-span-full"><EmptyRooms /></div>}
+                : <div className="col-span-full"><EmptyRooms searchQuery={filters.search} /></div>}
             </div>
             {!loading && rooms.length > PER_PAGE && (
               <div className="mt-10">
